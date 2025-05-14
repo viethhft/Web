@@ -1,12 +1,13 @@
 using Data.Dto;
+using Data.Common;
 
 namespace Application.Services.IServices
 {
     public interface ISoundService
     {
-        public Task<List<SoundDto>> GetSound(int PageSize = 10, int PageNumber = 1);
-        public Task<string> AddSound(AddSoundDto sound, FileSound file);
-        public Task<string> UpdateSound(EditSoundDto sound, FileSound file);
-        public Task<string> DeleteSound(long id);
+        Task<ResponseData<Pagination<SoundDto>>> GetSound(int PageSize = 10, int PageNumber = 1);
+        Task<ResponseData<string>> AddSound(AddSoundDto sound, FileSound file);
+        Task<ResponseData<string>> UpdateSound(EditSoundDto sound, FileSound file);
+        Task<ResponseData<string>> DeleteSound(long id);
     }
 }

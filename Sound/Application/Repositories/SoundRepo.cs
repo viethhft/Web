@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using Data.Dto;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
+using Data.Common;
 
 namespace Application.Repositories
 {
@@ -14,12 +15,12 @@ namespace Application.Repositories
             _configuration = configuration;
         }
 
-        public async Task<List<SoundDto>> GetSound(int PageSize = 10, int PageNumber = 1)
+        public async Task<ResponseData<Pagination<SoundDto>>> GetSound(int PageSize = 10, int PageNumber = 1)
         {
             PageNumber = PageNumber < 0 ? PageNumber = 1 : PageNumber;
             List<SoundDto> lst = new List<SoundDto>();
             string connectionString = _configuration.GetConnectionString("SoundDB");
-
+            int totalPage = 0;
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 try
@@ -46,19 +47,39 @@ namespace Application.Repositories
                                 };
                                 lst.Add(temp);
                             }
+                            if (await reader.NextResultAsync())
+                            {
+                                if (await reader.ReadAsync())
+                                {
+                                    totalPage = Convert.ToInt32(reader["TotalPage"]);
+                                }
+                            }
                         }
                     }
+                    return new ResponseData<Pagination<SoundDto>>
+                    {
+                        IsSuccess = true,
+                        Data = new Pagination<SoundDto>
+                        {
+                            TotalPage = totalPage,
+                            CurrentPage = PageNumber,
+                            Data = lst,
+                        }
+                    };
                 }
                 catch (SqlException ex)
                 {
                     Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<Pagination<SoundDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message
+                    };
                 }
             }
-
-            return lst;
         }
 
-        public async Task<string> AddSound(AddSoundDto sound, FileSound file)
+        public async Task<ResponseData<string>> AddSound(AddSoundDto sound, FileSound file)
         {
             string connectionString = _configuration.GetConnectionString("SoundDB");
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -78,18 +99,26 @@ namespace Application.Repositories
                         cmd.Parameters.Add("@Content", System.Data.SqlDbType.VarBinary, -1).Value = file.Content;
                         cmd.Parameters.Add("@ContentType", System.Data.SqlDbType.VarChar, 50).Value = file.ContentType;
                         var response = await cmd.ExecuteNonQueryAsync();
-                        return "Thành công";
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = true,
+                            Message = "Thêm sound thành công!",
+                        };
                     }
                 }
                 catch (SqlException ex)
                 {
                     Console.WriteLine("Lỗi SQL: " + ex.Message);
-                    return "Lỗi SQL: " + ex.Message;
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Message = "Lỗi : " + ex.Message,
+                    };
                 }
             }
         }
 
-        public async Task<string> UpdateSound(EditSoundDto sound, FileSound file)
+        public async Task<ResponseData<string>> UpdateSound(EditSoundDto sound, FileSound file)
         {
             string connectionString = _configuration.GetConnectionString("SoundDB");
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -111,18 +140,26 @@ namespace Application.Repositories
                             cmd.Parameters.Add("@ContentType", System.Data.SqlDbType.VarChar, 50).Value = file.ContentType;
                         }
                         var response = await cmd.ExecuteNonQueryAsync();
-                        return "Thành công";
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = true,
+                            Message = "Sửa sound thành công!",
+                        };
                     }
                 }
                 catch (SqlException ex)
                 {
                     Console.WriteLine("Lỗi SQL: " + ex.Message);
-                    return "Lỗi SQL: " + ex.Message;
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Message = "Lỗi : " + ex.Message,
+                    };
                 }
             }
         }
 
-        public async Task<string> DeleteSound(long id)
+        public async Task<ResponseData<string>> DeleteSound(long id)
         {
             string connectionString = _configuration.GetConnectionString("SoundDB");
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -137,13 +174,21 @@ namespace Application.Repositories
                         cmd.Parameters.Add("@Id", System.Data.SqlDbType.BigInt).Value = id;
 
                         var response = await cmd.ExecuteNonQueryAsync();
-                        return "Thành công";
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = true,
+                            Message = "Xoá sound thành công!",
+                        };
                     }
                 }
                 catch (SqlException ex)
                 {
                     Console.WriteLine("Lỗi SQL: " + ex.Message);
-                    return "Lỗi SQL: " + ex.Message;
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Message = "Lỗi : " + ex.Message,
+                    };
                 }
             }
         }

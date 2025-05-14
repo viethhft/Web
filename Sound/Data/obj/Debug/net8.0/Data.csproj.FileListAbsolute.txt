@@ -7,6 +7,7 @@
 /Users/macminia2/Web/Sound/Data/obj/Debug/net8.0/Data.AssemblyInfoInputs.cache
 /Users/macminia2/Web/Sound/Data/obj/Debug/net8.0/Data.AssemblyInfo.cs
 /Users/macminia2/Web/Sound/Data/obj/Debug/net8.0/Data.csproj.CoreCompileInputs.cache
+/Users/macminia2/Web/Sound/Data/obj/Debug/net8.0/Data.sourcelink.json
 /Users/macminia2/Web/Sound/Data/obj/Debug/net8.0/Data.dll
 /Users/macminia2/Web/Sound/Data/obj/Debug/net8.0/refint/Data.dll
 /Users/macminia2/Web/Sound/Data/obj/Debug/net8.0/Data.pdb

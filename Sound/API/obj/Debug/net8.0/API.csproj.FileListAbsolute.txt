@@ -122,8 +122,10 @@
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/runtimes/win/lib/net6.0/System.Runtime.Caching.dll
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/runtimes/win/lib/net6.0/System.Security.Cryptography.ProtectedData.dll
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/runtimes/win/lib/net6.0/System.Windows.Extensions.dll
+/Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Application.dll
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Data.dll
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Data.pdb
+/Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Application.pdb
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.csproj.AssemblyReference.cache
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.GeneratedMSBuildEditorConfig.editorconfig
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.AssemblyInfoInputs.cache
@@ -131,6 +133,7 @@
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.csproj.CoreCompileInputs.cache
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.MvcApplicationPartsAssemblyInfo.cs
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.MvcApplicationPartsAssemblyInfo.cache
+/Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.sourcelink.json
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/staticwebassets.build.json
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/staticwebassets.development.json
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/staticwebassets/msbuild.API.Microsoft.AspNetCore.StaticWebAssets.props
@@ -145,5 +148,3 @@
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.pdb
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.genruntimeconfig.cache
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/ref/API.dll
-/Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Application.dll
-/Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Application.pdb

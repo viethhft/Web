@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Data.Dto;
 using Application.Services.IServices;
 using Microsoft.AspNetCore.Http;
+using Data.Common;
 
 namespace API.Controllers
 {
@@ -15,71 +16,134 @@ namespace API.Controllers
             _soundService = soundService;
         }
         [HttpGet("GetSoundData")]
-        public async Task<List<GetSoundDto>> GetSound(int PageSize = 10, int PageNumber = 1)
+        public async Task<ResponseData<Pagination<GetSoundDto>>> GetSound(int PageSize = 10, int PageNumber = 1)
         {
             List<GetSoundDto> lstSound = new List<GetSoundDto>();
-            var lst = await _soundService.GetSound(PageSize, PageNumber);
-            foreach (var item in lst)
+            var repsonse = await _soundService.GetSound(PageSize, PageNumber);
+            if (repsonse.IsSuccess)
             {
-                var content = new MemoryStream(item.Content as byte[]);
-                var file = new FormFile(content, 0, content.Length, "file", item.FileName)
+                foreach (var item in repsonse.Data.Data)
                 {
-                    Headers = new HeaderDictionary(),
-                    ContentType = item.ContentType
-                };
-                var sound = new GetSoundDto()
+                    var content = new MemoryStream(item.Content as byte[]);
+                    var file = new FormFile(content, 0, content.Length, "file", item.FileName)
+                    {
+                        Headers = new HeaderDictionary(),
+                        ContentType = item.ContentType
+                    };
+                    var sound = new GetSoundDto()
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Image = item.Image,
+                        SoundFile = file,
+                    };
+                    lstSound.Add(sound);
+                }
+                return new ResponseData<Pagination<GetSoundDto>>
                 {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Image = item.Image,
-                    SoundFile = file,
+                    IsSuccess = true,
+                    Data = new Pagination<GetSoundDto>
+                    {
+                        TotalPage = repsonse.Data.TotalPage,
+                        CurrentPage = repsonse.Data.CurrentPage,
+                        Data = lstSound,
+                    },
                 };
-                lstSound.Add(sound);
             }
-            return lstSound;
+            else
+            {
+                return new ResponseData<Pagination<GetSoundDto>>
+                {
+                    IsSuccess = false,
+                    Message = "Không có dữ liệu.",
+                };
+            }
         }
 
         [HttpPost("AddSound")]
-        public async Task<string> AddSound(AddSoundDto sound, IFormFile fileSound)
+        public async Task<ResponseData<string>> AddSound(AddSound sound)
         {
-            byte[] content;
-            using (var ms = new MemoryStream())
+            if ((sound.File.Length > 0 && sound.File.ContentType == "audio/mpeg") && (sound.Image.Length > 0 && sound.Image.ContentType.StartsWith("image/")))
             {
-                await fileSound.CopyToAsync(ms);
-                content = ms.ToArray();
+                byte[] content;
+                string image = "";
+                using (var ms = new MemoryStream())
+                {
+                    await sound.File.CopyToAsync(ms);
+                    content = ms.ToArray();
+                    await sound.Image.CopyToAsync(ms);
+                    var tempImageData = ms.ToArray();
+                    image = Convert.ToBase64String(tempImageData);
+                }
+
+                var file = new FileSound()
+                {
+                    Content = content,
+                    ContentType = sound.File.ContentType,
+                    FileName = sound.File.FileName
+                };
+
+                var temp = new AddSoundDto()
+                {
+                    Image = image,
+                    Name = sound.Name,
+                };
+                return await _soundService.AddSound(temp, file);
             }
-
-            var file = new FileSound()
+            else
             {
-                Content = content,
-                ContentType = fileSound.ContentType,
-                FileName = fileSound.FileName
-            };
-
-            return await _soundService.AddSound(sound, file);
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Message = "Vui lòng chọn file để thêm hoặc chọn đúng file là định dạng âm thanh."
+                };
+            }
         }
 
         [HttpPut("UpdateSound")]
-        public async Task<string> UpdateSound(EditSoundDto sound, IFormFile fileSound)
+        public async Task<ResponseData<string>> UpdateSound(EditSound sound)
         {
             byte[] content;
-            using (var ms = new MemoryStream())
+            string image = "";
+            FileSound file = new FileSound();
+
+            if (sound.File.Length > 0 && sound.File.ContentType == "audio/mpeg")
             {
-                await fileSound.CopyToAsync(ms);
-                content = ms.ToArray();
+                using (var ms = new MemoryStream())
+                {
+                    await sound.File.CopyToAsync(ms);
+                    content = ms.ToArray();
+                }
+
+                file = new FileSound()
+                {
+                    Content = content,
+                    ContentType = sound.File.ContentType,
+                    FileName = sound.File.FileName
+                };
             }
 
-            var file = new FileSound()
+            if (sound.Image.Length > 0 && sound.Image.ContentType.StartsWith("image/"))
             {
-                Content = content,
-                ContentType = fileSound.ContentType,
-                FileName = fileSound.FileName
+                using (var ms = new MemoryStream())
+                {
+                    await sound.Image.CopyToAsync(ms);
+                    image = Convert.ToBase64String(ms.ToArray());
+                }
+
+            }
+
+            var temp = new EditSoundDto()
+            {
+                Image = image,
+                Name = sound.Name,
+                Id = sound.Id,
             };
-            return await _soundService.UpdateSound(sound, file);
+            return await _soundService.UpdateSound(temp, file);
         }
 
         [HttpDelete("DeleteSound")]
-        public async Task<string> DeleteSound(long id)
+        public async Task<ResponseData<string>> DeleteSound(long id)
         {
             return await _soundService.DeleteSound(id);
         }
