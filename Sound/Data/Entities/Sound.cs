@@ -6,5 +6,6 @@ namespace Data.Entities
         public string Name { get; set; }
         public string Image { get; set; }
         public AudioData AudioData { get; set; }
+        public ICollection<MixSound> MixSounds { get; set; }
     }
 }

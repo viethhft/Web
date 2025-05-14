@@ -1,27 +1,30 @@
 using Application.Repositories.IRepositories;
 using System.Data.SqlClient;
 using Data.Dto;
+using Data.Dto.Mix;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using Data.Common;
+using System.Data;
 
 namespace Application.Repositories
 {
     public class SoundRepo : ISoundRepo
     {
         private readonly IConfiguration _configuration;
+        string _connectionString = "";
         public SoundRepo(IConfiguration configuration)
         {
             _configuration = configuration;
+            _connectionString = _configuration.GetConnectionString("SoundDB");
         }
 
         public async Task<ResponseData<Pagination<SoundDto>>> GetSound(int PageSize = 10, int PageNumber = 1)
         {
             PageNumber = PageNumber < 0 ? PageNumber = 1 : PageNumber;
             List<SoundDto> lst = new List<SoundDto>();
-            string connectionString = _configuration.GetConnectionString("SoundDB");
             int totalPage = 0;
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 try
                 {
@@ -81,8 +84,7 @@ namespace Application.Repositories
 
         public async Task<ResponseData<string>> AddSound(AddSoundDto sound, FileSound file)
         {
-            string connectionString = _configuration.GetConnectionString("SoundDB");
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 try
                 {
@@ -120,8 +122,7 @@ namespace Application.Repositories
 
         public async Task<ResponseData<string>> UpdateSound(EditSoundDto sound, FileSound file)
         {
-            string connectionString = _configuration.GetConnectionString("SoundDB");
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 try
                 {
@@ -161,8 +162,7 @@ namespace Application.Repositories
 
         public async Task<ResponseData<string>> DeleteSound(long id)
         {
-            string connectionString = _configuration.GetConnectionString("SoundDB");
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 try
                 {
@@ -191,6 +191,100 @@ namespace Application.Repositories
                     };
                 }
             }
+        }
+        public async Task<ResponseData<List<GetMixSoundDto>>> GetSound(int idMix)
+        {
+            List<GetMixSoundDto> lst = new List<GetMixSoundDto>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand("GetMix", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@IdMix", System.Data.SqlDbType.BigInt).Value = idMix;
+
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            var temp = new GetMixSoundDto
+                            {
+                                SoundName = reader["Name"].ToString(),
+                                Image = reader["Image"].ToString(),
+                                FileName = reader["FileName"].ToString(),
+                                Content = reader["Content"] as byte[],
+                                ContentType = reader["ContentType"].ToString(),
+                            };
+                            lst.Add(temp);
+                        }
+                    }
+                    return new ResponseData<List<GetMixSoundDto>>
+                    {
+                        IsSuccess = true,
+                        Data = lst,
+                    };
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<List<GetMixSoundDto>>
+                    {
+                        IsSuccess = true,
+                        Message = "Lỗi : " + ex.Message,
+                    };
+                }
+            }
+        }
+        public async Task<ResponseData<string>> CreateMix(CreateMixSoundDto mix)
+        {
+            List<GetMixSoundDto> lst = new List<GetMixSoundDto>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand("CreateMix", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@Name", System.Data.SqlDbType.BigInt).Value = mix.Name;
+
+                        DataTable idSound = new DataTable();
+                        idSound.Columns.Add("IdSound", typeof(long));
+                        foreach (var item in mix.IdSounds)
+                        {
+                            idSound.Rows.Add(item);
+                        }
+                        var param = cmd.Parameters.AddWithValue("@Ids", idSound);
+                        param.SqlDbType = SqlDbType.Structured;
+                        param.TypeName = "IdListType";
+                        var response = await cmd.ExecuteNonQueryAsync();
+                    }
+
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Message = "Thêm danh sách nhạc mix thành công!"
+                    };
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Message = "Lỗi : " + ex.Message,
+                    };
+                }
+            }
+        }
+        public async Task<ResponseData<string>> SaveMix()
+        {
+            await Task.Delay(1000);
+            return new ResponseData<string>
+            {
+                IsSuccess = true,
+                Message = "Chưa có Api",
+            };
         }
     }
 }

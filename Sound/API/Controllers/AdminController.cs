@@ -16,43 +16,25 @@ namespace API.Controllers
             _soundService = soundService;
         }
         [HttpGet("GetSoundData")]
-        public async Task<ResponseData<Pagination<GetSoundDto>>> GetSound(int PageSize = 10, int PageNumber = 1)
+        public async Task<ResponseData<Pagination<SoundDto>>> GetSound(int PageSize = 10, int PageNumber = 1)
         {
-            List<GetSoundDto> lstSound = new List<GetSoundDto>();
             var repsonse = await _soundService.GetSound(PageSize, PageNumber);
             if (repsonse.IsSuccess)
             {
-                foreach (var item in repsonse.Data.Data)
-                {
-                    var content = new MemoryStream(item.Content as byte[]);
-                    var file = new FormFile(content, 0, content.Length, "file", item.FileName)
-                    {
-                        Headers = new HeaderDictionary(),
-                        ContentType = item.ContentType
-                    };
-                    var sound = new GetSoundDto()
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        Image = item.Image,
-                        SoundFile = file,
-                    };
-                    lstSound.Add(sound);
-                }
-                return new ResponseData<Pagination<GetSoundDto>>
+                return new ResponseData<Pagination<SoundDto>>
                 {
                     IsSuccess = true,
-                    Data = new Pagination<GetSoundDto>
+                    Data = new Pagination<SoundDto>
                     {
                         TotalPage = repsonse.Data.TotalPage,
                         CurrentPage = repsonse.Data.CurrentPage,
-                        Data = lstSound,
+                        Data = repsonse.Data.Data,
                     },
                 };
             }
             else
             {
-                return new ResponseData<Pagination<GetSoundDto>>
+                return new ResponseData<Pagination<SoundDto>>
                 {
                     IsSuccess = false,
                     Message = "Không có dữ liệu.",
