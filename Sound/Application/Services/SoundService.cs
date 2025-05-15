@@ -1,6 +1,7 @@
 using Application.Repositories.IRepositories;
 using Application.Services.IServices;
 using Data.Dto;
+using Data.Dto.Mix;
 using Data.Common;
 
 namespace Application.Services
@@ -27,6 +28,18 @@ namespace Application.Services
         public async Task<ResponseData<string>> DeleteSound(long id)
         {
             return await _soundRepo.DeleteSound(id);
+        }
+        public async Task<ResponseData<List<GetMixSoundDto>>> GetSound(int idMix)
+        {
+            return await _soundRepo.GetSound(idMix);
+        }
+        public async Task<ResponseData<string>> CreateMix(CreateMixSoundDto mix)
+        {
+            return await _soundRepo.CreateMix(mix);
+        }
+        public async Task<ResponseData<string>> SaveMix(UpdateMixSoundDto update)
+        {
+            return await _soundRepo.SaveMix(update);
         }
     }
 }

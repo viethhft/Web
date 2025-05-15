@@ -59,16 +59,32 @@ namespace Application.Repositories
                             }
                         }
                     }
-                    return new ResponseData<Pagination<SoundDto>>
+                    if (lst.Count > 0)
                     {
-                        IsSuccess = true,
-                        Data = new Pagination<SoundDto>
+                        return new ResponseData<Pagination<SoundDto>>
                         {
-                            TotalPage = totalPage,
-                            CurrentPage = PageNumber,
-                            Data = lst,
-                        }
-                    };
+                            IsSuccess = true,
+                            Data = new Pagination<SoundDto>
+                            {
+                                TotalPage = totalPage,
+                                CurrentPage = PageNumber,
+                                Data = lst,
+                            }
+                        };
+                    }
+                    else
+                    {
+                        return new ResponseData<Pagination<SoundDto>>
+                        {
+                            IsSuccess = false,
+                            Data = new Pagination<SoundDto>
+                            {
+                                TotalPage = totalPage,
+                                CurrentPage = PageNumber,
+                                Data = new List<SoundDto>(),
+                            }
+                        };
+                    }
                 }
                 catch (SqlException ex)
                 {
@@ -207,15 +223,20 @@ namespace Application.Repositories
 
                         using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
-                            var temp = new GetMixSoundDto
+                            while (await reader.ReadAsync())
                             {
-                                SoundName = reader["Name"].ToString(),
-                                Image = reader["Image"].ToString(),
-                                FileName = reader["FileName"].ToString(),
-                                Content = reader["Content"] as byte[],
-                                ContentType = reader["ContentType"].ToString(),
-                            };
-                            lst.Add(temp);
+                                var temp = new GetMixSoundDto
+                                {
+                                    SoundName = reader["Name"].ToString(),
+                                    Image = reader["Image"].ToString(),
+                                    FileName = reader["FileName"].ToString(),
+                                    Content = reader["Content"] as byte[],
+                                    ContentType = reader["ContentType"].ToString(),
+                                    IdMix = idMix,
+                                    IdSound = (long)reader["IdSound"]
+                                };
+                                lst.Add(temp);
+                            }
                         }
                     }
                     return new ResponseData<List<GetMixSoundDto>>
@@ -237,7 +258,6 @@ namespace Application.Repositories
         }
         public async Task<ResponseData<string>> CreateMix(CreateMixSoundDto mix)
         {
-            List<GetMixSoundDto> lst = new List<GetMixSoundDto>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 try
@@ -246,7 +266,7 @@ namespace Application.Repositories
                     using (SqlCommand cmd = new SqlCommand("CreateMix", conn))
                     {
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.Parameters.Add("@Name", System.Data.SqlDbType.BigInt).Value = mix.Name;
+                        cmd.Parameters.Add("@Name", System.Data.SqlDbType.NVarChar,50).Value = mix.Name;
 
                         DataTable idSound = new DataTable();
                         idSound.Columns.Add("IdSound", typeof(long));
@@ -277,14 +297,46 @@ namespace Application.Repositories
                 }
             }
         }
-        public async Task<ResponseData<string>> SaveMix()
+        public async Task<ResponseData<string>> SaveMix(UpdateMixSoundDto update)
         {
-            await Task.Delay(1000);
-            return new ResponseData<string>
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                IsSuccess = true,
-                Message = "Chưa có Api",
-            };
+                try
+                {
+                    await conn.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand("UpdateMix", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@IdMix", System.Data.SqlDbType.BigInt).Value = update.IdMix;
+
+                        DataTable idSound = new DataTable();
+                        idSound.Columns.Add("IdSound", typeof(long));
+                        foreach (var item in update.IdSounds)
+                        {
+                            idSound.Rows.Add(item);
+                        }
+                        var param = cmd.Parameters.AddWithValue("@Ids", idSound);
+                        param.SqlDbType = SqlDbType.Structured;
+                        param.TypeName = "IdListType";
+                        var response = await cmd.ExecuteNonQueryAsync();
+                    }
+
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Message = "Thay đổi danh sách nhạc mix thành công!"
+                    };
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Message = "Lỗi : " + ex.Message,
+                    };
+                }
+            }
         }
     }
 }

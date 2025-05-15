@@ -3,6 +3,7 @@ using Data.Dto;
 using Application.Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Data.Common;
+using Data.Dto.Mix;
 
 namespace API.Controllers
 {
@@ -128,6 +129,24 @@ namespace API.Controllers
         public async Task<ResponseData<string>> DeleteSound(long id)
         {
             return await _soundService.DeleteSound(id);
+        }
+        [HttpGet("GetSoundMix")]
+
+        public async Task<ResponseData<List<GetMixSoundDto>>> GetSound(int idMix)
+        {
+            return await _soundService.GetSound(idMix);
+        }
+        [HttpPost("CreateMixSound")]
+
+        public async Task<ResponseData<string>> CreateMix(CreateMixSoundDto mix)
+        {
+            return await _soundService.CreateMix(mix);
+        }
+
+        [HttpPut("SaveMixSound")]
+        public async Task<ResponseData<string>> SaveMix(UpdateMixSoundDto update)
+        {
+            return await _soundService.SaveMix(update);
         }
     }
 }
