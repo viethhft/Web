@@ -13,5 +13,6 @@ namespace Application.Repositories.IRepositories
         Task<ResponseData<string>> AddSound(AddSoundDto sound, FileSound file);
         Task<ResponseData<string>> UpdateSound(EditSoundDto sound, FileSound file);
         Task<ResponseData<string>> DeleteSound(long id);
+        Task<ResponseData<string>> ActiveSound(long id);
     }
 }

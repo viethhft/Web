@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Application.Repositories.IRepositories;
 using Application.Repositories;
 using Application.Services.IServices;

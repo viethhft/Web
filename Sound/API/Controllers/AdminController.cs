@@ -46,7 +46,7 @@ namespace API.Controllers
         [HttpPost("AddSound")]
         public async Task<ResponseData<string>> AddSound(AddSound sound)
         {
-            if ((sound.File.Length > 0 && sound.File.ContentType == "audio/mpeg") && (sound.Image.Length > 0 && sound.Image.ContentType.StartsWith("image/")))
+            if ((sound.File != null && sound.File.Length > 0 && sound.File.ContentType == "audio/mpeg") && (sound.Image != null && sound.Image.Length > 0 && sound.Image.ContentType.StartsWith("image/")))
             {
                 byte[] content;
                 string image = "";
@@ -90,7 +90,7 @@ namespace API.Controllers
             string image = "";
             FileSound file = new FileSound();
 
-            if (sound.File.Length > 0 && sound.File.ContentType == "audio/mpeg")
+            if ((sound.File != null && sound.File.Length > 0 && sound.File.ContentType == "audio/mpeg"))
             {
                 using (var ms = new MemoryStream())
                 {
@@ -106,7 +106,7 @@ namespace API.Controllers
                 };
             }
 
-            if (sound.Image.Length > 0 && sound.Image.ContentType.StartsWith("image/"))
+            if ((sound.Image != null && sound.Image.Length > 0 && sound.Image.ContentType.StartsWith("image/")))
             {
                 using (var ms = new MemoryStream())
                 {
@@ -130,6 +130,13 @@ namespace API.Controllers
         {
             return await _soundService.DeleteSound(id);
         }
+
+        [HttpPatch("ActiveSound")]
+        public async Task<ResponseData<string>> ActiveSound(long id)
+        {
+            return await _soundService.ActiveSound(id);
+        }
+
         [HttpGet("GetSoundMix")]
 
         public async Task<ResponseData<List<GetMixSoundDto>>> GetSound(int idMix)

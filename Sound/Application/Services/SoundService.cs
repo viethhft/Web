@@ -41,5 +41,9 @@ namespace Application.Services
         {
             return await _soundRepo.SaveMix(update);
         }
+        public async Task<ResponseData<string>> ActiveSound(long id)
+        {
+            return await _soundRepo.ActiveSound(id);
+        }
     }
 }

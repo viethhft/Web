@@ -208,6 +208,38 @@ namespace Application.Repositories
                 }
             }
         }
+        public async Task<ResponseData<string>> ActiveSound(long id)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand("ActiveSound", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@IdSound", System.Data.SqlDbType.BigInt).Value = id;
+
+                        var response = await cmd.ExecuteNonQueryAsync();
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = true,
+                            Message = "Active sound thành công!",
+                        };
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = true,
+                        Message = "Lỗi : " + ex.Message,
+                    };
+                }
+            }
+        }
         public async Task<ResponseData<List<GetMixSoundDto>>> GetSound(int idMix)
         {
             List<GetMixSoundDto> lst = new List<GetMixSoundDto>();
@@ -266,7 +298,7 @@ namespace Application.Repositories
                     using (SqlCommand cmd = new SqlCommand("CreateMix", conn))
                     {
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.Parameters.Add("@Name", System.Data.SqlDbType.NVarChar,50).Value = mix.Name;
+                        cmd.Parameters.Add("@Name", System.Data.SqlDbType.NVarChar, 50).Value = mix.Name;
 
                         DataTable idSound = new DataTable();
                         idSound.Columns.Add("IdSound", typeof(long));

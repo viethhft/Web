@@ -12,7 +12,7 @@ namespace Data.Dto
     {
         public long Id { get; set; }
         public string Name { get; set; }
-        public IFormFile Image { get; set; }
-        public IFormFile File { get; set; }
+        public IFormFile? Image { get; set; }
+        public IFormFile? File { get; set; }
     }
 }
