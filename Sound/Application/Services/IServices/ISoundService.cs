@@ -14,5 +14,6 @@ namespace Application.Services.IServices
         Task<ResponseData<string>> UpdateSound(EditSoundDto sound, FileSound file);
         Task<ResponseData<string>> DeleteSound(long id);
         Task<ResponseData<string>> ActiveSound(long id);
+        
     }
 }

@@ -98,6 +98,86 @@ namespace Application.Repositories
             }
         }
 
+        public async Task<ResponseData<Pagination<AdminSoundDto>>> GetSoundByAdmin(int PageSize = 10, int PageNumber = 1)
+        {
+            PageNumber = PageNumber < 0 ? PageNumber = 1 : PageNumber;
+            List<AdminSoundDto> lst = new List<AdminSoundDto>();
+            int totalPage = 0;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand("GetSoundDataByAdmin", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@pageSize", System.Data.SqlDbType.Int).Value = PageSize;
+                        cmd.Parameters.Add("@pageNumber", System.Data.SqlDbType.Int).Value = PageNumber;
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var temp = new AdminSoundDto
+                                {
+                                    Name = reader["Name"].ToString(),
+                                    Image = reader["Image"].ToString(),
+                                    Id = (long)reader["Id"],
+                                    FileName = reader["FileName"].ToString(),
+                                    Content = reader["Content"] as byte[],
+                                    ContentType = reader["ContentType"].ToString(),
+                                    NameUserAdd = reader["DisplayName"].ToString()
+                                };
+                                lst.Add(temp);
+                            }
+                            if (await reader.NextResultAsync())
+                            {
+                                if (await reader.ReadAsync())
+                                {
+                                    totalPage = Convert.ToInt32(reader["TotalPage"]);
+                                }
+                            }
+                        }
+                    }
+                    if (lst.Count > 0)
+                    {
+                        return new ResponseData<Pagination<AdminSoundDto>>
+                        {
+                            IsSuccess = true,
+                            Data = new Pagination<AdminSoundDto>
+                            {
+                                TotalPage = totalPage,
+                                CurrentPage = PageNumber,
+                                Data = lst,
+                            }
+                        };
+                    }
+                    else
+                    {
+                        return new ResponseData<Pagination<AdminSoundDto>>
+                        {
+                            IsSuccess = false,
+                            Data = new Pagination<AdminSoundDto>
+                            {
+                                TotalPage = totalPage,
+                                CurrentPage = PageNumber,
+                                Data = new List<AdminSoundDto>(),
+                            }
+                        };
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<Pagination<AdminSoundDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message
+                    };
+                }
+            }
+        }
+
         public async Task<ResponseData<string>> AddSound(AddSoundDto sound, FileSound file)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

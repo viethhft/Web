@@ -4,6 +4,7 @@ using Application.Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Data.Common;
 using Data.Dto.Mix;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -16,6 +17,7 @@ namespace API.Controllers
         {
             _soundService = soundService;
         }
+
         [HttpGet("GetSoundData")]
         public async Task<ResponseData<Pagination<SoundDto>>> GetSound(int PageSize = 10, int PageNumber = 1)
         {
@@ -43,6 +45,7 @@ namespace API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("AddSound")]
         public async Task<ResponseData<string>> AddSound(AddSound sound)
         {
@@ -83,6 +86,7 @@ namespace API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("UpdateSound")]
         public async Task<ResponseData<string>> UpdateSound(EditSound sound)
         {
@@ -125,12 +129,14 @@ namespace API.Controllers
             return await _soundService.UpdateSound(temp, file);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("DeleteSound")]
         public async Task<ResponseData<string>> DeleteSound(long id)
         {
             return await _soundService.DeleteSound(id);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("ActiveSound")]
         public async Task<ResponseData<string>> ActiveSound(long id)
         {
@@ -138,13 +144,12 @@ namespace API.Controllers
         }
 
         [HttpGet("GetSoundMix")]
-
         public async Task<ResponseData<List<GetMixSoundDto>>> GetSound(int idMix)
         {
             return await _soundService.GetSound(idMix);
         }
-        [HttpPost("CreateMixSound")]
 
+        [HttpPost("CreateMixSound")]
         public async Task<ResponseData<string>> CreateMix(CreateMixSoundDto mix)
         {
             return await _soundService.CreateMix(mix);

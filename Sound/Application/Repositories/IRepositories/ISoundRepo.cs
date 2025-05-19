@@ -7,6 +7,7 @@ namespace Application.Repositories.IRepositories
     public interface ISoundRepo
     {
         Task<ResponseData<Pagination<SoundDto>>> GetSound(int PageSize = 10, int PageNumber = 1);
+        Task<ResponseData<Pagination<AdminSoundDto>>> GetSoundByAdmin(int PageSize = 10, int PageNumber = 1);
         Task<ResponseData<List<GetMixSoundDto>>> GetSound(int idMix);
         Task<ResponseData<string>> CreateMix(CreateMixSoundDto mix);
         Task<ResponseData<string>> SaveMix(UpdateMixSoundDto update);
