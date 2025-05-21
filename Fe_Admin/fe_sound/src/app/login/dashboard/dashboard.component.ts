@@ -7,7 +7,7 @@ import { Router } from "@angular/router"
     styleUrls: ["./dashboard.component.scss"],
 })
 export class DashboardComponent {
-    activeTab = "overview"
+    activeTab = "analytics"
 
     constructor(private router: Router) { }
 

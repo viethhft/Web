@@ -1,124 +1,20 @@
-<div class="dashboard-container">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo-container">
-                <svg viewBox="0 0 24 24" fill="none" class="logo">
-                    <!-- Moon -->
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="1.5"
-                        stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
-                    <!-- Sound waves -->
-                    <path d="M9 14.5C9 14.5 10 16.5 12 16.5C14 16.5 15 14.5 15 14.5" stroke="currentColor"
-                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <!-- Stars -->
-                    <circle cx="17" cy="7" r="1" fill="currentColor"></circle>
-                    <circle cx="19" cy="11" r="0.5" fill="currentColor"></circle>
-                    <circle cx="14" cy="5" r="0.5" fill="currentColor"></circle>
-                    <!-- Musical note -->
-                    <circle cx="7.5" cy="14" r="1" fill="currentColor"></circle>
-                    <path d="M7.5 14V10" stroke="currentColor" stroke-width="1" stroke-linecap="round"></path>
-                    <path d="M7.5 10L9 9.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"></path>
-                </svg>
-            </div>
-            <div class="title-container">
-                <h1 class="title">SoundSleep</h1>
-                <p class="subtitle">Quản lý hệ thống</p>
-            </div>
-        </div>
-
-        <nav class="sidebar-nav">
-            <button class="nav-item" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-                <span>Tổng quan</span>
-            </button>
-
-            <button class="nav-item" [class.active]="activeTab === 'employees'" (click)="setActiveTab('employees')">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-                <span>Quản lý nhân viên</span>
-            </button>
-
-            <button class="nav-item" [class.active]="activeTab === 'music'" (click)="setActiveTab('music')">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 18V5l12-2v13"></path>
-                    <circle cx="6" cy="18" r="3"></circle>
-                    <circle cx="18" cy="16" r="3"></circle>
-                </svg>
-                <span>Quản lý âm nhạc</span>
-            </button>
-
-            <button class="nav-item" [class.active]="activeTab === 'analytics'" (click)="setActiveTab('analytics')">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="20" x2="18" y2="10"></line>
-                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="14"></line>
-                </svg>
-                <span>Thống kê</span>
-            </button>
-
-            <button class="nav-item" [class.active]="activeTab === 'settings'" (click)="setActiveTab('settings')">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                    </path>
-                </svg>
-                <span>Cài đặt</span>
-            </button>
-        </nav>
-
-        <div class="sidebar-footer">
-            <button class="logout-button" (click)="logout()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                <span>Đăng xuất</span>
-            </button>
-        </div>
+<div class="employee-management-container">
+    <div class="header-actions">
+        <h1 class="page-title">Quản lý nhân viên</h1>
+        <button class="add-button" (click)="addEmployee()">
+            <span>Thêm nhân viên</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        </button>
     </div>
 
-    <!-- Main content -->
-    <div class="main-content">
-        <!-- Header -->
-        <header class="header">
-            <!-- Sound wave animation in header -->
-            <div class="sound-wave-container">
-                <div class="sound-wave-wrapper">
-                    <div class="sound-wave-bars">
-                        <ng-container *ngFor="let i of [].constructor(50); let index = index">
-                            <div class="sound-wave-bar" [style.height.px]="getSoundWaveHeight(index)"
-                                [style.animation-delay.s]="index * 0.05" [style.animation-duration.s]="1"></div>
-                        </ng-container>
-                    </div>
-                </div>
-            </div>
-
-            <div class="header-left">
-                <button class="menu-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-
+    <div class="employee-table-card">
+        <div class="table-filters">
             <div class="search-container">
                 <div class="search-input-wrapper">
                     <svg xmlns="http://www.w3.org/2000/svg" class="search-icon" viewBox="0 0 24 24" fill="none"
@@ -126,48 +22,83 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" class="search-input" placeholder="Tìm kiếm...">
+                    <input type="text" class="search-input" placeholder="Tìm kiếm nhân viên..." [value]="searchQuery"
+                        (input)="onSearch($event)">
                 </div>
             </div>
 
-            <div class="header-right">
-                <button class="notification-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    <span class="notification-badge">3</span>
+            <div class="filter-options">
+                <select class="filter-select" [value]="selectedRole" (change)="onRoleChange($event)">
+                    <option *ngFor="let role of roles">{{ role }}</option>
+                </select>
+
+                <select class="filter-select" [value]="selectedStatus" (change)="onStatusChange($event)">
+                    <option *ngFor="let status of statuses">{{ status }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="employee-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên</th>
+                        <th>Email</th>
+                        <th>Vai trò</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let employee of employees">
+                        <td>{{ employee.id }}</td>
+                        <td>{{ employee.name }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>{{ employee.role }}</td>
+                        <td>
+                            <span class="status-badge" [ngClass]="getStatusClass(employee.status)">{{ employee.status
+                                }}</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-button" (click)="editEmployee(employee)" title="Chỉnh sửa">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </button>
+                                <button class="action-button delete-button" (click)="deleteEmployee(employee)"
+                                    title="Xóa">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M3 6h18"></path>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-pagination">
+            <p class="pagination-info">Hiển thị 1-{{ employees.length }} của {{ employees.length }} nhân viên</p>
+            <div class="pagination-controls">
+                <button class="pagination-button" [disabled]="currentPage === 1" (click)="previousPage()">
+                    Trước
                 </button>
-
-                <div class="user-dropdown">
-                    <button class="user-dropdown-button">
-                        <div class="user-avatar">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
-                        </div>
-                        <span class="user-name">Admin</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="dropdown-icon" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                    </button>
-                </div>
+                <button class="pagination-button active">{{ currentPage }}</button>
+                <button class="pagination-button" [disabled]="currentPage === totalPages" (click)="nextPage()">
+                    Sau
+                </button>
             </div>
-        </header>
-
-        <!-- Main content area -->
-        <main class="content">
-            <app-overview *ngIf="activeTab === 'overview'"></app-overview>
-            <app-employee-management *ngIf="activeTab === 'employees'"></app-employee-management>
-            <app-music-management *ngIf="activeTab === 'music'"></app-music-management>
-            <div *ngIf="activeTab === 'analytics'" class="analytics-placeholder">
-                <h1 class="analytics-title">Trang thống kê chi tiết đang được phát triển</h1>
-            </div>
-            <app-settings *ngIf="activeTab === 'settings'"></app-settings>
-        </main>
+        </div>
     </div>
 </div>
