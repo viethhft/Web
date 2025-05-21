@@ -9,6 +9,9 @@
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Azure.Identity.dll
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Dapper.dll
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Humanizer.dll
+/Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Konscious.Security.Cryptography.Argon2.dll
+/Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Konscious.Security.Cryptography.Blake2.dll
+/Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Microsoft.AspNetCore.OpenApi.dll
 /Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Microsoft.Bcl.AsyncInterfaces.dll
@@ -148,6 +151,3 @@
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.pdb
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/API.genruntimeconfig.cache
 /Users/macminia2/Web/Sound/API/obj/Debug/net8.0/ref/API.dll
-/Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
-/Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Konscious.Security.Cryptography.Argon2.dll
-/Users/macminia2/Web/Sound/API/bin/Debug/net8.0/Konscious.Security.Cryptography.Blake2.dll

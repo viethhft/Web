@@ -22,7 +22,22 @@ namespace Data.Dto.User
         public string Id { get; set; }
         public string Password { get; set; }
         public string Roles { get; set; }
-        public int TotalRow { get; set; }
+        public bool IsConfirm { get; set; }
 
+    }
+    public class UpdateInfoDto
+    {
+        public string Name { get; set; }
+        public string Token { get; set; }
+        public string DisplayName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+    }
+    public class InfoUserDto
+    {
+        public string Name { get; set; }
+        public string Password { get; set; }
+        public string Email { get; set; }
+        public string Code { get; set; }
     }
 }

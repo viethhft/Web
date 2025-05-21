@@ -4,6 +4,7 @@ using Application.Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Data.Common;
 using Microsoft.AspNetCore.Authorization;
+using Data.Dto.Role;
 
 namespace API.Controllers
 {
@@ -30,9 +31,9 @@ namespace API.Controllers
         }
 
         [HttpPut("UpdateUser")]
-        public async Task<ResponseData<string>> UpdateUser()
+        public async Task<ResponseData<string>> UpdateUser(UpdateInfoDto updateInfo)
         {
-            return await _userService.UpdateUser();
+            return await _userService.UpdateUser(updateInfo);
         }
 
         [HttpDelete("DeleteUser")]
@@ -56,7 +57,31 @@ namespace API.Controllers
         public async Task<ResponseData<string>> Admin(CreateAdminDto user)
         {
             return await _userService.Admin(user);
-
+        }
+        [HttpPut("UpdateRole")]
+        public async Task<ResponseData<string>> UpdateRole(UpdateRoleUserDto updateRole)
+        {
+            return await _userService.UpdateRole(updateRole);
+        }
+        [HttpGet("GetListRole")]
+        public async Task<ResponseData<List<RoleDto>>> GetListRole()
+        {
+            return await _userService.GetListRole();
+        }
+        [HttpPatch("ChangePassword")]
+        public async Task<ResponseData<string>> ChangePassword(ChangePasswordDto changePassword)
+        {
+            return await _userService.ChangePassword(changePassword);
+        }
+        [HttpGet("ForgotPassword")]
+        public async Task<ResponseData<string>> ForgotPassword(string email)
+        {
+            return await _userService.ForgotPassword(email);
+        }
+        [HttpPatch("ChangeForgotPassword")]
+        public async Task<ResponseData<string>> ChangeForgotPassword(ForgotPasswordDto forgotPassword)
+        {
+            return await _userService.ChangeForgotPassword(forgotPassword);
         }
     }
 }

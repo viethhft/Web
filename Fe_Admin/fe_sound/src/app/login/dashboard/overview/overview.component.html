@@ -1,0 +1,140 @@
+<div class="overview-container">
+    <h1 class="page-title">Tổng quan hệ thống</h1>
+
+    <!-- Stats cards -->
+    <div class="stats-grid">
+        <div class="stat-card" *ngFor="let stat of stats">
+            <div class="stat-content">
+                <div>
+                    <p class="stat-title">{{ stat.title }}</p>
+                    <h3 class="stat-value">{{ stat.value | number }}</h3>
+                </div>
+                <div class="stat-icon" [ngClass]="'stat-icon-' + stat.icon">
+                    <svg *ngIf="stat.icon === 'users'" xmlns="http://www.w3.org/2000/svg" class="icon"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <svg *ngIf="stat.icon === 'file-music'" xmlns="http://www.w3.org/2000/svg" class="icon"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M9 18V5l12-2v13"></path>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                    <svg *ngIf="stat.icon === 'bar-chart'" xmlns="http://www.w3.org/2000/svg" class="icon"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    <svg *ngIf="stat.icon === 'user'" xmlns="http://www.w3.org/2000/svg" class="icon"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+            </div>
+            <div class="stat-footer">
+                <span class="stat-change">↑ {{ stat.change }}%</span> so với tháng trước
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3 class="chart-title">Lượt phát theo thể loại</h3>
+            <div class="category-chart">
+                <div class="category-column" *ngFor="let category of categoryPlays">
+                    <div class="category-bar" [ngClass]="'category-bar-' + category.color"
+                        [style.height.px]="category.height">
+                    </div>
+                    <p class="category-name">{{ category.category }}</p>
+                    <p class="category-value">{{ category.plays }} lượt</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3 class="chart-title">Lượt phát theo thời gian</h3>
+            <div class="weekly-chart">
+                <div class="weekly-column" *ngFor="let height of weeklyPlays; let i = index">
+                    <div class="weekly-bar" [style.height.px]="height * 2"></div>
+                    <p class="weekly-label">T{{ i + 1 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent activities and popular files -->
+    <div class="activity-grid">
+        <div class="activity-card">
+            <h3 class="activity-title">Hoạt động gần đây</h3>
+            <div class="activity-list">
+                <div class="activity-item" *ngFor="let activity of recentActivities">
+                    <div class="activity-avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text"><span class="activity-user">{{ activity.user }}</span> {{
+                            activity.action }}</p>
+                        <p class="activity-time">{{ activity.time }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-card">
+            <h3 class="activity-title">File âm nhạc phổ biến</h3>
+            <div class="activity-list">
+                <div class="activity-item" *ngFor="let file of popularMusicFiles">
+                    <div class="activity-avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 18V5l12-2v13"></path>
+                            <circle cx="6" cy="18" r="3"></circle>
+                            <circle cx="18" cy="16" r="3"></circle>
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <div class="file-header">
+                            <p class="file-title">{{ file.title }}</p>
+                            <p class="file-plays">{{ file.plays }} lượt phát</p>
+                        </div>
+                        <div class="file-category">
+                            <span class="category-badge" [ngClass]="getCategoryClass(file.category)">{{ file.category
+                                }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 5 music files -->
+    <div class="top-files-card">
+        <h3 class="top-files-title">Top 5 bản nhạc được phát nhiều nhất</h3>
+        <div class="top-files-list">
+            <div class="top-file-item" *ngFor="let file of topMusicFiles">
+                <div class="top-file-header">
+                    <p class="top-file-title">{{ file.title }}</p>
+                    <p class="top-file-plays">{{ file.plays }} lượt phát</p>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" [style.width.%]="file.percent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  

@@ -1,0 +1,114 @@
+<div class="settings-container">
+    <h1 class="page-title">Cài đặt hệ thống</h1>
+
+    <div class="settings-card">
+        <div class="settings-section">
+            <h3 class="section-title">Cài đặt tài khoản</h3>
+            <form [formGroup]="accountForm" (ngSubmit)="saveAccountChanges()">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="username">Tên người dùng</label>
+                        <input type="text" id="username" formControlName="username" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" formControlName="email" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="newPassword">Mật khẩu mới</label>
+                        <input type="password" id="newPassword" formControlName="newPassword" placeholder="••••••••"
+                            class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Xác nhận mật khẩu</label>
+                        <input type="password" id="confirmPassword" formControlName="confirmPassword"
+                            placeholder="••••••••" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="save-button">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="settings-section">
+            <h3 class="section-title">Cài đặt thông báo</h3>
+            <div class="toggle-list">
+                <div class="toggle-item">
+                    <div class="toggle-content">
+                        <p class="toggle-title">Thông báo email</p>
+                        <p class="toggle-description">Nhận thông báo qua email khi có file âm nhạc mới</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" [checked]="notificationSettings.emailNotifications"
+                            (change)="toggleNotification('emailNotifications')">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-item">
+                    <div class="toggle-content">
+                        <p class="toggle-title">Thông báo hệ thống</p>
+                        <p class="toggle-description">Nhận thông báo trong hệ thống</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" [checked]="notificationSettings.systemNotifications"
+                            (change)="toggleNotification('systemNotifications')">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-item">
+                    <div class="toggle-content">
+                        <p class="toggle-title">Thông báo cập nhật</p>
+                        <p class="toggle-description">Nhận thông báo khi có cập nhật hệ thống</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" [checked]="notificationSettings.updateNotifications"
+                            (change)="toggleNotification('updateNotifications')">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3 class="section-title">Cài đặt hệ thống</h3>
+            <div class="form-group">
+                <label for="language">Ngôn ngữ</label>
+                <select id="language" class="form-select">
+                    <option>Tiếng Việt</option>
+                    <option>English</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="timezone">Múi giờ</label>
+                <select id="timezone" class="form-select">
+                    <option>(GMT+07:00) Hà Nội, Bangkok</option>
+                    <option>(GMT+08:00) Bắc Kinh, Singapore</option>
+                    <option>(GMT+09:00) Tokyo, Seoul</option>
+                </select>
+            </div>
+
+            <div class="toggle-item">
+                <div class="toggle-content">
+                    <p class="toggle-title">Chế độ tối</p>
+                    <p class="toggle-description">Bật/tắt chế độ tối cho giao diện</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" [checked]="systemSettings.darkMode" (change)="toggleDarkMode()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="save-button" (click)="saveSystemChanges()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+</div>

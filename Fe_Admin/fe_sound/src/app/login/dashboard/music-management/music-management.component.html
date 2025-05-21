@@ -1,0 +1,122 @@
+<div class="music-management-container">
+    <div class="header-actions">
+        <h1 class="page-title">Quản lý file âm nhạc</h1>
+        <button class="upload-button" (click)="uploadNewFile()">
+            <span>Tải lên file mới</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+        </button>
+    </div>
+
+    <div class="music-table-card">
+        <div class="table-filters">
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="search-icon" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" class="search-input" placeholder="Tìm kiếm file âm nhạc..." [value]="searchQuery"
+                        (input)="onSearch($event)">
+                </div>
+            </div>
+
+            <div class="filter-options">
+                <select class="filter-select" [value]="selectedCategory" (change)="onCategoryChange($event)">
+                    <option *ngFor="let category of categories">{{ category }}</option>
+                </select>
+
+                <select class="filter-select" [value]="sortOption" (change)="onSortChange($event)">
+                    <option *ngFor="let option of sortOptions">{{ option }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="music-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên bản nhạc</th>
+                        <th>Nghệ sĩ</th>
+                        <th>Thời lượng</th>
+                        <th>Thể loại</th>
+                        <th>Lượt phát</th>
+                        <th>Ngày thêm</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let file of musicFiles">
+                        <td>{{ file.id }}</td>
+                        <td class="file-title-cell">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="file-icon" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 18V5l12-2v13"></path>
+                                <circle cx="6" cy="18" r="3"></circle>
+                                <circle cx="18" cy="16" r="3"></circle>
+                            </svg>
+                            <span>{{ file.title }}</span>
+                        </td>
+                        <td>{{ file.artist }}</td>
+                        <td>{{ file.duration }}</td>
+                        <td>
+                            <span class="category-badge" [ngClass]="getCategoryClass(file.category)">{{ file.category
+                                }}</span>
+                        </td>
+                        <td>{{ file.plays }}</td>
+                        <td>{{ file.dateAdded }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-button" (click)="playMusic(file)" title="Phát">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                                    </svg>
+                                </button>
+                                <button class="action-button" (click)="editMusic(file)" title="Chỉnh sửa">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </button>
+                                <button class="action-button delete-button" (click)="deleteMusic(file)" title="Xóa">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M3 6h18"></path>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-pagination">
+            <p class="pagination-info">Hiển thị 1-{{ musicFiles.length }} của {{ musicFiles.length }} file âm nhạc</p>
+            <div class="pagination-controls">
+                <button class="pagination-button" [disabled]="currentPage === 1" (click)="previousPage()">
+                    Trước
+                </button>
+                <button class="pagination-button active">{{ currentPage }}</button>
+                <button class="pagination-button" [disabled]="currentPage === totalPages" (click)="nextPage()">
+                    Sau
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -45,6 +45,33 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet("GetSoundByAdmin")]
+        public async Task<ResponseData<Pagination<AdminSoundDto>>> GetSoundByAdmin(int PageSize = 10, int PageNumber = 1)
+        {
+            var repsonse = await _soundService.GetSoundByAdmin(PageSize, PageNumber);
+            if (repsonse.IsSuccess)
+            {
+                return new ResponseData<Pagination<AdminSoundDto>>
+                {
+                    IsSuccess = true,
+                    Data = new Pagination<AdminSoundDto>
+                    {
+                        TotalPage = repsonse.Data.TotalPage,
+                        CurrentPage = repsonse.Data.CurrentPage,
+                        Data = repsonse.Data.Data,
+                    },
+                };
+            }
+            else
+            {
+                return new ResponseData<Pagination<AdminSoundDto>>
+                {
+                    IsSuccess = false,
+                    Message = "Không có dữ liệu.",
+                };
+            }
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost("AddSound")]
         public async Task<ResponseData<string>> AddSound(AddSound sound)
@@ -73,6 +100,7 @@ namespace API.Controllers
                 {
                     Image = image,
                     Name = sound.Name,
+                    Token = sound.Token
                 };
                 return await _soundService.AddSound(temp, file);
             }

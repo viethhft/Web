@@ -5,6 +5,8 @@ using Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Data.Entities;
+using Sound.Application.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,7 @@ builder.Services.AddScoped<ISoundRepo, SoundRepo>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<ISoundService, SoundService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<Extentions>();
 
 // builder.Services.AddAuthentication(options =>
 // {
@@ -49,6 +52,13 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 builder.Services.AddCors(options =>
 {
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+
     options.AddPolicy("AllowAll", policy =>
     {
         policy.AllowAnyOrigin()

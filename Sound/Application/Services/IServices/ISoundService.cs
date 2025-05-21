@@ -14,6 +14,7 @@ namespace Application.Services.IServices
         Task<ResponseData<string>> UpdateSound(EditSoundDto sound, FileSound file);
         Task<ResponseData<string>> DeleteSound(long id);
         Task<ResponseData<string>> ActiveSound(long id);
-        
+        Task<ResponseData<Pagination<AdminSoundDto>>> GetSoundByAdmin(int PageSize = 10, int PageNumber = 1);
+
     }
 }

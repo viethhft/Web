@@ -6,28 +6,22 @@ using Microsoft.AspNetCore.Http;
 using Data.Common;
 using System.Data;
 using Data.Dto.User;
-using System.Security.Cryptography;
-using Konscious.Security.Cryptography;
-using System.Text;
-using System;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Globalization;
+using Data.Dto.Role;
+using Sound.Application.Extentions;
 
 namespace Application.Repositories
 {
     public class UserRepo : IUserRepo
     {
         private readonly IConfiguration _configuration;
+        private readonly Extentions _extentions;
         string _connectionString = "";
-        public UserRepo(IConfiguration configuration)
+        public UserRepo(IConfiguration configuration, Extentions extentions)
         {
+            _extentions = extentions;
             _configuration = configuration;
             _connectionString = _configuration.GetConnectionString("SoundDB");
         }
-
         public async Task<ResponseData<Pagination<UserDto>>> GetListUser(int PageSize = 10, int PageNumber = 1)
         {
             PageNumber = PageNumber < 0 ? PageNumber = 1 : PageNumber;
@@ -121,15 +115,25 @@ namespace Application.Repositories
                     {
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
+
+                        var infoUserDto = new InfoUserDto
+                        {
+                            Name = _extentions.GenerateUserNameByName(user.DisplayName),
+                            Password = _extentions.GeneratePassword(),
+                            Email = user.Email,
+                            Code = _extentions.GenerateCodeConfirm(),
+                        };
                         cmd.Parameters.Add("@email", System.Data.SqlDbType.NVarChar, 255).Value = user.Email;
                         cmd.Parameters.Add("@displayName", System.Data.SqlDbType.NVarChar, 50).Value = user.DisplayName;
                         cmd.Parameters.Add("@gender", System.Data.SqlDbType.Bit).Value = user.Gender;
-                        cmd.Parameters.Add("@idBoss", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(GetIdForToken(user.Token));
-                        cmd.Parameters.Add("@password", System.Data.SqlDbType.VarChar, -1).Value = HashPassword(GeneratePassword());
-                        cmd.Parameters.Add("@codeConfirm", System.Data.SqlDbType.VarChar, 50).Value = GenerateCodeConfirm();
-                        cmd.Parameters.Add("@name", System.Data.SqlDbType.VarChar, 50).Value = GenerateUserNameByName(user.DisplayName);
+                        cmd.Parameters.Add("@idBoss", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(_extentions.GetIdForToken(user.Token));
+                        cmd.Parameters.Add("@password", System.Data.SqlDbType.VarChar, -1).Value = _extentions.HashPassword(infoUserDto.Password);
+                        cmd.Parameters.Add("@codeConfirm", System.Data.SqlDbType.VarChar, 50).Value = infoUserDto.Code;
+                        cmd.Parameters.Add("@name", System.Data.SqlDbType.VarChar, 50).Value = infoUserDto.Name;
 
                         var response = await cmd.ExecuteNonQueryAsync();
+
+                        await _extentions.SendEmailAccount(infoUserDto);
 
                         return new ResponseData<string>
                         {
@@ -166,7 +170,7 @@ namespace Application.Repositories
                         cmd.Parameters.Add("@displayName", System.Data.SqlDbType.NVarChar, 50).Value = user.DisplayName;
                         cmd.Parameters.Add("@gender", System.Data.SqlDbType.Bit).Value = user.Gender;
                         cmd.Parameters.Add("@name", System.Data.SqlDbType.VarChar).Value = user.Name;
-                        cmd.Parameters.Add("@pass", System.Data.SqlDbType.VarChar, -1).Value = HashPassword(user.Password);
+                        cmd.Parameters.Add("@pass", System.Data.SqlDbType.VarChar, -1).Value = _extentions.HashPassword(user.Password);
 
                         var response = await cmd.ExecuteNonQueryAsync();
 
@@ -188,7 +192,7 @@ namespace Application.Repositories
                 }
             }
         }
-        public async Task<ResponseData<string>> UpdateUser()
+        public async Task<ResponseData<string>> UpdateUser(UpdateInfoDto updateInfo)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -196,24 +200,24 @@ namespace Application.Repositories
                 {
                     await conn.OpenAsync();
 
-                    // using (SqlCommand cmd = new SqlCommand("CreateStaff", conn))
-                    // {
-                    //     cmd.CommandType = System.Data.CommandType.StoredProcedure;
-
-                    //     cmd.Parameters.Add("@email", System.Data.SqlDbType.NVarchar, 255).Value = user.Email;
-                    //     cmd.Parameters.Add("@displayName", System.Data.SqlDbType.NVarchar, 50).Value = user.DisplayName;
-                    //     cmd.Parameters.Add("@gender", System.Data.SqlDbType.Bit).Value = user.Gender;
-                    //     cmd.Parameters.Add("@idBoss", System.Data.SqlDbType.UniqueIdentifier).Value = user.IdBoss;
-                    //     cmd.Parameters.Add("@password", System.Data.SqlDbType.VarChar, -1).Value = user.Password;
-                    //     cmd.Parameters.Add("@codeConfirm", System.Data.SqlDbType.VarChar, 50).Value = user.CodeConfirm;
-
-                    //     var response = await cmd.ExecuteNonQueryAsync();
-
-                    return new ResponseData<string>
+                    using (SqlCommand cmd = new SqlCommand("UpdateInfo", conn))
                     {
-                        IsSuccess = true,
-                        Message = "Chưa có api!",
-                    };
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(_extentions.GetIdForToken(updateInfo.Token));
+                        cmd.Parameters.Add("@name", System.Data.SqlDbType.VarChar, 50).Value = updateInfo.Name;
+                        cmd.Parameters.Add("@displayName", System.Data.SqlDbType.NVarChar, 100).Value = updateInfo.DisplayName;
+                        cmd.Parameters.Add("@phoneNumber", System.Data.SqlDbType.VarChar, 20).Value = updateInfo.PhoneNumber;
+                        cmd.Parameters.Add("@email", System.Data.SqlDbType.NVarChar, 255).Value = updateInfo.Email;
+
+                        var response = await cmd.ExecuteNonQueryAsync();
+
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = true,
+                            Message = "Cập nhật thông tin thành công!",
+                        };
+                    }
                 }
                 catch (SqlException ex)
                 {
@@ -239,7 +243,7 @@ namespace Application.Repositories
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                         cmd.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = action.IdUser;
-                        cmd.Parameters.Add("@idBoss", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(GetIdForToken(action.Token));
+                        cmd.Parameters.Add("@idBoss", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(_extentions.GetIdForToken(action.Token));
 
                         var response = await cmd.ExecuteNonQueryAsync();
 
@@ -274,7 +278,7 @@ namespace Application.Repositories
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                         cmd.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = action.IdUser;
-                        cmd.Parameters.Add("@idBoss", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(GetIdForToken(action.Token));
+                        cmd.Parameters.Add("@idBossUpdate", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(_extentions.GetIdForToken(action.Token));
 
                         var response = await cmd.ExecuteNonQueryAsync();
 
@@ -314,61 +318,34 @@ namespace Application.Repositories
                         {
                             if (await reader.ReadAsync())
                             {
-                                data.TotalRow = Convert.ToInt32(reader["TotalRow"]);
-                                if (data.TotalRow == 1)
+                                data.Password = reader["PasswordHash"].ToString();
+                                data.Id = reader["Id"].ToString();
+                                data.Roles = reader["Roles"].ToString();
+                                data.IsConfirm = (bool)reader["IsConfirm"];
+                                if (_extentions.VerifyPassword(data.Password, dataLogin.Password))
                                 {
-                                    if (await reader.NextResultAsync())
+                                    return new ResponseData<string>
                                     {
-                                        if (await reader.ReadAsync())
-                                        {
-                                            data.Password = reader["PasswordHash"].ToString();
-                                            data.Id = reader["Id"].ToString();
-                                            data.Roles = reader["Roles"].ToString();
-                                        }
-                                        if (VerifyPassword(data.Password, dataLogin.Password))
-                                        {
-                                            return new ResponseData<string>
-                                            {
-                                                IsSuccess = true,
-                                                Message = "Đăng nhập thành công!",
-                                                Data = GenerateTokenString(data),
-                                            };
-                                        }
-                                        else
-                                        {
-                                            return new ResponseData<string>
-                                            {
-                                                IsSuccess = false,
-                                                Message = "Tài khoản hoặc mật khẩu không chính xác!",
-                                            };
-                                        }
-                                    }
-                                    else
-                                    {
-                                        return new ResponseData<string>
-                                        {
-                                            IsSuccess = false,
-                                            Message = "Tài khoản không tồn tại!",
-                                        };
-                                    }
-
+                                        IsSuccess = true,
+                                        Message = "Đăng nhập thành công!",
+                                        Data = _extentions.GenerateTokenString(data),
+                                    };
                                 }
                                 else
                                 {
                                     return new ResponseData<string>
                                     {
                                         IsSuccess = false,
-                                        Message = "Tài khoản không tồn tại!",
+                                        Message = "Tài khoản hoặc mật khẩu không chính xác hoặc tài khoản đã bị khoá!!",
                                     };
                                 }
-
                             }
                             else
                             {
                                 return new ResponseData<string>
                                 {
                                     IsSuccess = false,
-                                    Message = "Tài khoản không tồn tại!",
+                                    Message = "Tài khoản hoặc mật khẩu không chính xác hoặc tài khoản đã bị khoá!!",
                                 };
                             }
                         }
@@ -385,149 +362,311 @@ namespace Application.Repositories
                 }
             }
         }
-        public string HashPassword(string password)
+        public async Task<ResponseData<string>> UpdateRole(UpdateRoleUserDto updateRole)
         {
-            byte[] salt = new byte[16];
-            using (var rng = RandomNumberGenerator.Create())
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                rng.GetBytes(salt);
-            }
-
-            var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
-            {
-                Salt = salt,
-                DegreeOfParallelism = 8, // Số luồng xử lý
-                Iterations = 4,          // Số lần lặp
-                MemorySize = 1024 * 64   // Dung lượng bộ nhớ (64 MB)
-            };
-
-            byte[] hashBytes = argon2.GetBytes(32); // Kích thước hash 32 bytes
-
-            // Kết hợp salt + hash thành một chuỗi để lưu (Base64)
-            byte[] result = new byte[salt.Length + hashBytes.Length];
-            Buffer.BlockCopy(salt, 0, result, 0, salt.Length);
-            Buffer.BlockCopy(hashBytes, 0, result, salt.Length, hashBytes.Length);
-
-            return Convert.ToBase64String(result);
-        }
-        public bool VerifyPassword(string hashedPassword, string password)
-        {
-            byte[] decoded = Convert.FromBase64String(hashedPassword);
-
-            // Tách salt và hash
-            byte[] salt = new byte[16];
-            byte[] hash = new byte[32];
-
-            Buffer.BlockCopy(decoded, 0, salt, 0, 16);
-            Buffer.BlockCopy(decoded, 16, hash, 0, 32);
-
-            var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
-            {
-                Salt = salt,
-                DegreeOfParallelism = 8,
-                Iterations = 4,
-                MemorySize = 1024 * 64
-            };
-
-            byte[] computedHash = argon2.GetBytes(32);
-
-            // So sánh hash
-            return CryptographicOperations.FixedTimeEquals(hash, computedHash);
-        }
-        public string GenerateTokenString(LoginDataDto data)
-        {
-            var claims = new List<Claim>()
-            {
-                new Claim(ClaimTypes.NameIdentifier, data.Id.ToString()),
-            };
-            foreach (var item in data.Roles.Split(","))
-            {
-                claims.Add(new Claim(ClaimTypes.Role, item));
-            }
-
-            SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
-            SigningCredentials signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-            SecurityToken securityToken = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30),
-                issuer: "",
-                audience: "",
-                signingCredentials: signingCred
-                );
-            string token = new JwtSecurityTokenHandler().WriteToken(securityToken);
-            return token;
-        }
-        public string GenerateCodeConfirm()
-        {
-            string code = "";
-            for (int i = 0; i < 6; i++)
-            {
-                Random random = new Random();
-                if (random.Next(0, 10) % 2 == 0)
+                try
                 {
-                    code += random.Next(0, 9).ToString();
+                    await conn.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand("UpdateRoleUser", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@IdUser", System.Data.SqlDbType.UniqueIdentifier).Value = updateRole.IdUser;
+
+                        DataTable idRole = new DataTable();
+                        idRole.Columns.Add("IdRole", typeof(Guid));
+                        foreach (var item in updateRole.ListIdRole)
+                        {
+                            idRole.Rows.Add(item);
+                        }
+                        var param = cmd.Parameters.AddWithValue("@Ids", idRole);
+                        param.SqlDbType = SqlDbType.Structured;
+                        param.TypeName = "ListIdRole";
+                        var response = await cmd.ExecuteNonQueryAsync();
+
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = true,
+                            Message = "Thay đổi danh sách quyền thành công!"
+                        };
+                    }
                 }
-                else code += Convert.ToChar(random.Next(65, 90)).ToString();
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message,
+                    };
+                }
             }
-            return code;
         }
-        public string GetIdForToken(string token)
+        public async Task<ResponseData<List<RoleDto>>> GetListRole()
         {
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(token);
-            var claim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if (claim != null)
+            List<RoleDto> lst = new List<RoleDto>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                return claim.Value;
+                try
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand("GetListRole", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var temp = new RoleDto
+                                {
+                                    Id = Guid.Parse(reader["Id"].ToString()),
+                                    Name = reader["DisplayName"].ToString(),
+                                };
+                                lst.Add(temp);
+                            }
+                        }
+                    }
+                    if (lst.Count > 0)
+                    {
+                        return new ResponseData<List<RoleDto>>
+                        {
+                            IsSuccess = true,
+                            Data = lst,
+                        };
+                    }
+                    else
+                    {
+                        return new ResponseData<List<RoleDto>>
+                        {
+                            IsSuccess = false,
+                            Data = new List<RoleDto>()
+                        };
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<List<RoleDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message
+                    };
+                }
             }
-            return null;
         }
-        public string GeneratePassword()
+        public async Task<ResponseData<string>> ChangePassword(ChangePasswordDto changePassword)
         {
-            var random = new Random();
-            var passwordChars = new List<char>();
-
-            // 1 ký tự viết hoa
-            passwordChars.Add((char)random.Next(65, 91)); // A-Z
-
-            // 6 ký tự: số hoặc chữ hoa ngẫu nhiên
-            for (int i = 0; i < 6; i++)
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                if (random.Next(2) == 0)
-                    passwordChars.Add((char)random.Next(48, 58)); // 0–9
+                try
+                {
+                    if (changePassword.NewPassword != changePassword.ConfirmPassword)
+                    {
+                        return new ResponseData<string>
+                        {
+                            IsSuccess = false,
+                            Message = "Mật khẩu không khớp!"
+                        };
+                    }
+                    else
+                    {
+                        await conn.OpenAsync();
+
+                        using (SqlCommand cmd = new SqlCommand("GetHashPasswordUser", conn))
+                        {
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                            cmd.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(_extentions.GetIdForToken(changePassword.Token));
+
+                            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                            {
+                                if (await reader.ReadAsync())
+                                {
+                                    if (_extentions.VerifyPassword(reader["PasswordHash"].ToString(), changePassword.OldPassword))
+                                    {
+                                        using (SqlCommand cmd1 = new SqlCommand("ChangePassword", conn))
+                                        {
+                                            cmd1.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                            cmd1.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(_extentions.GetIdForToken(changePassword.Token));
+                                            cmd1.Parameters.Add("@newPass", System.Data.SqlDbType.VarChar, -1).Value = _extentions.HashPassword(changePassword.NewPassword);
+
+                                            var response = await cmd1.ExecuteNonQueryAsync();
+                                        }
+                                        return new ResponseData<string>
+                                        {
+                                            IsSuccess = true,
+                                            Message = "Đổi mật khẩu thành công!",
+                                        };
+                                    }
+                                    else
+                                    {
+                                        return new ResponseData<string>
+                                        {
+                                            IsSuccess = false,
+                                            Message = "Mật khẩu cũ không chính xác!"
+                                        };
+                                    }
+                                }
+                                else
+                                {
+                                    return new ResponseData<string>
+                                    {
+                                        IsSuccess = false,
+                                        Message = "Không tìm thấy tài khoản!"
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message
+                    };
+                }
+            }
+        }
+        public async Task<ResponseData<string>> ForgotPassword(string email)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand("ForgotPassword", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@email", System.Data.SqlDbType.NVarChar, 255).Value = email;
+
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                var code = _extentions.GenerateCodeConfirm();
+                                using (SqlCommand cmd1 = new SqlCommand("UpdateCodeForgotPassword", conn))
+                                {
+                                    cmd1.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                    cmd1.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(reader["Id"].ToString());
+                                    cmd1.Parameters.Add("@code", System.Data.SqlDbType.VarChar, 50).Value = code;
+
+                                    var response = await cmd1.ExecuteNonQueryAsync();
+                                    await _extentions.SendEmailForgotPassword(reader["Email"].ToString(), code);
+                                    return new ResponseData<string>
+                                    {
+                                        IsSuccess = true,
+                                        Message = "Đã gửi mã xác nhận đến email của bạn!",
+                                    };
+                                }
+                            }
+                            else
+                            {
+                                return new ResponseData<string>
+                                {
+                                    IsSuccess = false,
+                                    Message = "Tài khoản không tồn tại!"
+                                };
+                            }
+                        }
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message
+                    };
+                }
+            }
+        }
+        public async Task<ResponseData<string>> ChangeForgotPassword(ForgotPasswordDto forgotPassword)
+        {
+            try
+            {
+                if (forgotPassword.NewPassword != forgotPassword.ConfirmPassword)
+                {
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Message = "Mật khẩu không khớp!"
+                    };
+                }
                 else
-                    passwordChars.Add((char)random.Next(65, 91)); // A–Z
-            }
-
-            // 1 ký tự đặc biệt
-            var ranges = new[] { (33, 48), (58, 65) };
-            var selected = ranges[random.Next(ranges.Length)];
-            passwordChars.Add((char)random.Next(selected.Item1, selected.Item2));
-
-            return new string(passwordChars.OrderBy(_ => random.Next()).ToArray());
-        }
-        public string GenerateUserNameByName(string name)
-        {
-            var normalizedString = name.Normalize(NormalizationForm.FormD);
-            var stringBuilder = new StringBuilder();
-
-            foreach (var c in normalizedString)
-            {
-                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
                 {
-                    stringBuilder.Append(c);
+                    using (SqlConnection conn = new SqlConnection(_connectionString))
+                    {
+                        await conn.OpenAsync();
+
+                        using (SqlCommand cmd = new SqlCommand("CheckCodeForgot", conn))
+                        {
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                            cmd.Parameters.Add("@email", System.Data.SqlDbType.VarChar, 50).Value = forgotPassword.Email;
+                            cmd.Parameters.Add("@code", System.Data.SqlDbType.VarChar, -1).Value = forgotPassword.Code;
+
+                            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                            {
+                                if (await reader.ReadAsync())
+                                {
+                                    if (reader["CodeConfirm"].ToString() == forgotPassword.Code)
+                                    {
+                                        using (SqlCommand cmd1 = new SqlCommand("ChangeForgotPassword", conn))
+                                        {
+                                            cmd1.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                            cmd1.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(reader["Id"].ToString());
+                                            cmd1.Parameters.Add("@newPass", System.Data.SqlDbType.VarChar, -1).Value = _extentions.HashPassword(forgotPassword.NewPassword);
+
+                                            var response = await cmd1.ExecuteNonQueryAsync();
+                                        }
+                                        return new ResponseData<string>
+                                        {
+                                            IsSuccess = true,
+                                            Message = "Đổi mật khẩu thành công!",
+                                        };
+                                    }
+                                    else
+                                    {
+                                        return new ResponseData<string>
+                                        {
+                                            IsSuccess = false,
+                                            Message = "Mã xác nhận không chính xác!"
+                                        };
+                                    }
+                                }
+                                else
+                                {
+                                    return new ResponseData<string>
+                                    {
+                                        IsSuccess = false,
+                                        Message = "Không tìm thấy tài khoản!"
+                                    };
+                                }
+                            }
+                        }
+                    }
                 }
             }
-
-            var result = stringBuilder.ToString().ToLower().Normalize(NormalizationForm.FormC);
-            string[] values = result.Split(' ');
-            var username = values[values.Length - 1];
-            for (int i = 0; i < values.Length - 1; i++)
+            catch (SqlException ex)
             {
-                username += values[i][0].ToString();
+                Console.WriteLine("Lỗi SQL: " + ex.Message);
+                return new ResponseData<string>
+                {
+                    IsSuccess = false,
+                    Message = "Lỗi : " + ex.Message
+                };
             }
-            return username;
         }
     }
 }

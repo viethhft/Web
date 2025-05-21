@@ -6,15 +6,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using Data.Common;
 using System.Data;
+using Sound.Application.Extentions;
+
 
 namespace Application.Repositories
 {
     public class SoundRepo : ISoundRepo
     {
         private readonly IConfiguration _configuration;
+        private readonly Extentions _extentions;
         string _connectionString = "";
-        public SoundRepo(IConfiguration configuration)
+        public SoundRepo(IConfiguration configuration, Extentions extentions)
         {
+            _extentions = extentions;
             _configuration = configuration;
             _connectionString = _configuration.GetConnectionString("SoundDB");
         }
@@ -97,7 +101,6 @@ namespace Application.Repositories
                 }
             }
         }
-
         public async Task<ResponseData<Pagination<AdminSoundDto>>> GetSoundByAdmin(int PageSize = 10, int PageNumber = 1)
         {
             PageNumber = PageNumber < 0 ? PageNumber = 1 : PageNumber;
@@ -177,7 +180,6 @@ namespace Application.Repositories
                 }
             }
         }
-
         public async Task<ResponseData<string>> AddSound(AddSoundDto sound, FileSound file)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -192,6 +194,7 @@ namespace Application.Repositories
 
                         cmd.Parameters.Add("@Name", System.Data.SqlDbType.NVarChar, 50).Value = sound.Name;
                         cmd.Parameters.Add("@Image", System.Data.SqlDbType.VarChar, 50).Value = sound.Image;
+                        cmd.Parameters.Add("@IdUserAdd", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(_extentions.GetIdForToken(sound.Token));
 
                         cmd.Parameters.Add("@FileName", System.Data.SqlDbType.NVarChar, 50).Value = file.FileName;
                         cmd.Parameters.Add("@Content", System.Data.SqlDbType.VarBinary, -1).Value = file.Content;
@@ -215,7 +218,6 @@ namespace Application.Repositories
                 }
             }
         }
-
         public async Task<ResponseData<string>> UpdateSound(EditSoundDto sound, FileSound file)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -255,7 +257,6 @@ namespace Application.Repositories
                 }
             }
         }
-
         public async Task<ResponseData<string>> DeleteSound(long id)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -389,14 +390,27 @@ namespace Application.Repositories
                         var param = cmd.Parameters.AddWithValue("@Ids", idSound);
                         param.SqlDbType = SqlDbType.Structured;
                         param.TypeName = "IdListType";
-                        var response = await cmd.ExecuteNonQueryAsync();
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                return new ResponseData<string>
+                                {
+                                    IsSuccess = true,
+                                    Message = "Thêm danh sách nhạc mix thành công!",
+                                    Data = reader["IdMix"].ToString()
+                                };
+                            }
+                            else
+                            {
+                                return new ResponseData<string>
+                                {
+                                    IsSuccess = false,
+                                    Message = "Thêm danh sách nhạc mix thất bại!",
+                                };
+                            }
+                        }
                     }
-
-                    return new ResponseData<string>
-                    {
-                        IsSuccess = true,
-                        Message = "Thêm danh sách nhạc mix thành công!"
-                    };
                 }
                 catch (SqlException ex)
                 {

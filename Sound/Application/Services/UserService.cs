@@ -4,6 +4,7 @@ using Data.Dto;
 using Data.Dto.Mix;
 using Data.Common;
 using Data.Dto.User;
+using Data.Dto.Role;
 
 namespace Application.Services
 {
@@ -18,13 +19,17 @@ namespace Application.Services
         {
             return await _userRepo.GetListUser(PageSize, PageNumber);
         }
+        public async Task<ResponseData<List<RoleDto>>> GetListRole()
+        {
+            return await _userRepo.GetListRole();
+        }
         public async Task<ResponseData<string>> CreateUser(CreateUserDto user)
         {
             return await _userRepo.CreateUser(user);
         }
-        public async Task<ResponseData<string>> UpdateUser()
+        public async Task<ResponseData<string>> UpdateUser(UpdateInfoDto updateInfo)
         {
-            return await _userRepo.UpdateUser();
+            return await _userRepo.UpdateUser(updateInfo);
         }
         public async Task<ResponseData<string>> DeleteUser(ActionDto action)
         {
@@ -41,7 +46,23 @@ namespace Application.Services
         public async Task<ResponseData<string>> Admin(CreateAdminDto user)
         {
             return await _userRepo.Admin(user);
+        }
+        public async Task<ResponseData<string>> UpdateRole(UpdateRoleUserDto updateRole)
+        {
+            return await _userRepo.UpdateRole(updateRole);
+        }
 
+        public async Task<ResponseData<string>> ChangePassword(ChangePasswordDto changePassword)
+        {
+            return await _userRepo.ChangePassword(changePassword);
+        }
+        public async Task<ResponseData<string>> ForgotPassword(string email)
+        {
+            return await _userRepo.ForgotPassword(email);
+        }
+        public async Task<ResponseData<string>> ChangeForgotPassword(ForgotPasswordDto forgotPassword)
+        {
+            return await _userRepo.ChangeForgotPassword(forgotPassword);
         }
     }
 }
