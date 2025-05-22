@@ -1,17 +1,21 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MusicManagementComponent } from './music-management.component';
-
+import { AddMusicComponent } from './add-music/add-music.component';
 
 @NgModule({
     declarations: [
-        MusicManagementComponent
+        MusicManagementComponent,
+        AddMusicComponent
     ],
     imports: [
-        CommonModule
+        CommonModule,
+        FormsModule
     ],
     exports: [
-        MusicManagementComponent
+        MusicManagementComponent,
+        AddMusicComponent
     ]
 })
 export class MusicManagementModule { } 

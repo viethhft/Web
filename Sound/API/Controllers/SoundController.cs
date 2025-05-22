@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Data.Common;
 using Data.Dto.Mix;
 using Microsoft.AspNetCore.Authorization;
+using Sound.Application.Extentions;
 
 namespace API.Controllers
 {
@@ -13,8 +14,10 @@ namespace API.Controllers
     public class SoundController : Controller
     {
         private readonly ISoundService _soundService;
-        public SoundController(ISoundService soundService)
+        private readonly Extentions _extentions;
+        public SoundController(ISoundService soundService, Extentions ext)
         {
+            _extentions = ext;
             _soundService = soundService;
         }
 
@@ -72,7 +75,7 @@ namespace API.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [HttpPost("AddSound")]
         public async Task<ResponseData<string>> AddSound(AddSound sound)
         {
@@ -80,13 +83,15 @@ namespace API.Controllers
             {
                 byte[] content;
                 string image = "";
+
+                content = await _extentions.CompressMp3Async(sound.File);
+
                 using (var ms = new MemoryStream())
                 {
-                    await sound.File.CopyToAsync(ms);
-                    content = ms.ToArray();
                     await sound.Image.CopyToAsync(ms);
-                    var tempImageData = ms.ToArray();
-                    image = Convert.ToBase64String(tempImageData);
+                    var data = ms.ToArray();
+                    image += $"data:{sound.Image.ContentType};base64,";
+                    image += Convert.ToBase64String(data);
                 }
 
                 var file = new FileSound()
@@ -114,7 +119,7 @@ namespace API.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [HttpPut("UpdateSound")]
         public async Task<ResponseData<string>> UpdateSound(EditSound sound)
         {
@@ -124,11 +129,7 @@ namespace API.Controllers
 
             if ((sound.File != null && sound.File.Length > 0 && sound.File.ContentType == "audio/mpeg"))
             {
-                using (var ms = new MemoryStream())
-                {
-                    await sound.File.CopyToAsync(ms);
-                    content = ms.ToArray();
-                }
+                content = await _extentions.CompressMp3Async(sound.File);
 
                 file = new FileSound()
                 {
@@ -143,9 +144,10 @@ namespace API.Controllers
                 using (var ms = new MemoryStream())
                 {
                     await sound.Image.CopyToAsync(ms);
-                    image = Convert.ToBase64String(ms.ToArray());
+                    var data = ms.ToArray();
+                    image += $"data:{sound.Image.ContentType};base64,";
+                    image += Convert.ToBase64String(data);
                 }
-
             }
 
             var temp = new EditSoundDto()
@@ -157,14 +159,14 @@ namespace API.Controllers
             return await _soundService.UpdateSound(temp, file);
         }
 
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [HttpDelete("DeleteSound")]
         public async Task<ResponseData<string>> DeleteSound(long id)
         {
             return await _soundService.DeleteSound(id);
         }
 
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [HttpPatch("ActiveSound")]
         public async Task<ResponseData<string>> ActiveSound(long id)
         {

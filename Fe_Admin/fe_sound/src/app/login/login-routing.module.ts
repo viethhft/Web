@@ -5,7 +5,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [
-    { path: 'login', component: LoginComponent },
+    { path: '', component: LoginComponent },
     { path: 'forgot-password', component: ForgotPasswordComponent },
     { path: 'dashboard', component: DashboardComponent },
     { path: '', redirectTo: 'login', pathMatch: 'full' }, // redirect /admin → /admin/login

@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { EmployeeManagementComponent } from './employee-management.component';
 
 const routes: Routes = [
-    { path: 'dashboard', component: EmployeeManagementComponent },
+    { path: '', component: EmployeeManagementComponent },
 ];
 @NgModule({
     imports: [RouterModule.forChild(routes)],

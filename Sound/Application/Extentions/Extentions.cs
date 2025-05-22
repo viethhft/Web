@@ -10,15 +10,58 @@ using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.Net.Mail;
 using System.Net;
+using Microsoft.AspNetCore.Http;
+using System.Diagnostics;
 
 namespace Sound.Application.Extentions
 {
     public class Extentions
     {
+        private readonly string ffmpegPath = "/Users/macminia2/Web/Sound/Application/Extentions/AppZip/ffmpeg";
         public Extentions()
         {
-
         }
+
+        public async Task<byte[]> CompressMp3Async(IFormFile inputFile, int bitrateKbps = 96)
+        {
+            using var ffmpeg = new Process();
+
+            ffmpeg.StartInfo.FileName = ffmpegPath;
+            // Đọc input từ stdin (-i pipe:0), xuất ra stdout (-f mp3 pipe:1)
+            ffmpeg.StartInfo.Arguments = $"-i pipe:0 -b:a {bitrateKbps}k -f mp3 pipe:1";
+
+            ffmpeg.StartInfo.UseShellExecute = false;
+            ffmpeg.StartInfo.RedirectStandardInput = true;
+            ffmpeg.StartInfo.RedirectStandardOutput = true;
+            ffmpeg.StartInfo.RedirectStandardError = true;  // Có thể đọc lỗi debug
+
+            ffmpeg.StartInfo.CreateNoWindow = true;
+
+            ffmpeg.Start();
+
+            // Task ghi dữ liệu file upload vào stdin của ffmpeg
+            var copyInputTask = inputFile.CopyToAsync(ffmpeg.StandardInput.BaseStream)
+                .ContinueWith(t => ffmpeg.StandardInput.Close());
+
+            // Đọc toàn bộ output nén từ stdout của ffmpeg
+            using var msOutput = new MemoryStream();
+            var copyOutputTask = ffmpeg.StandardOutput.BaseStream.CopyToAsync(msOutput);
+
+            // (Optional) Đọc log lỗi FFmpeg (nếu cần debug)
+            var errorLog = await ffmpeg.StandardError.ReadToEndAsync();
+
+            await Task.WhenAll(copyInputTask, copyOutputTask);
+
+            ffmpeg.WaitForExit();
+
+            if (ffmpeg.ExitCode != 0)
+            {
+                throw new Exception($"FFmpeg exited with code {ffmpeg.ExitCode}. Error: {errorLog}");
+            }
+
+            return msOutput.ToArray();
+        }
+
         public string HashPassword(string password)
         {
             byte[] salt = new byte[16];
@@ -262,5 +305,6 @@ namespace Sound.Application.Extentions
                 return false;
             }
         }
+
     }
 }

@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MusicManagementComponent } from './music-management.component';
 
 const routes: Routes = [
-    { path: 'music-management', component: MusicManagementComponent },
+    { path: '', component: MusicManagementComponent },
 ];
 @NgModule({
     imports: [RouterModule.forChild(routes)],

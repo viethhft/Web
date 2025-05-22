@@ -1,95 +1,63 @@
-import { Component } from "@angular/core"
-
-interface MusicFile {
-    id: number
-    title: string
-    artist: string
-    duration: string
-    category: string
-    plays: number
-    dateAdded: string
-}
+import { ChangeDetectorRef, Component, OnInit } from "@angular/core"
+import { SoundService } from "../../../../services/sound/sound.service"
+import { ConvertDate } from "../../../../share/Services/Extentions"
+import { GetList } from "../../../../share/Dtos/Dtos.Share"
+import { AdminSound } from "../../../../services/sound/sound.dtos"
+import { BaseModel, DataSettingForm } from "../../../../share/Dtos/Base.model"
+import { AddMusicComponent } from "./add-music/add-music.component"
+import { MatDialog } from "@angular/material/dialog"
 
 @Component({
     selector: "app-music-management",
     templateUrl: "./music-management.component.html",
     styleUrls: ["./music-management.component.scss"],
 })
-export class MusicManagementComponent {
+export class MusicManagementComponent extends BaseModel implements OnInit {
     searchQuery = ""
     selectedCategory = "Tất cả thể loại"
     sortOption = "Sắp xếp theo"
-    currentPage = 1
-    totalPages = 1
-
-    musicFiles: MusicFile[] = [
-        {
-            id: 1,
-            title: "Bản nhạc thư giãn #1",
-            artist: "Nghệ sĩ A",
-            duration: "3:45",
-            category: "Thư giãn",
-            plays: 120,
-            dateAdded: "15/05/2025",
-        },
-        {
-            id: 2,
-            title: "Bản nhạc thư giãn #2",
-            artist: "Nghệ sĩ B",
-            duration: "4:20",
-            category: "Thư giãn",
-            plays: 95,
-            dateAdded: "14/05/2025",
-        },
-        {
-            id: 3,
-            title: "Bản nhạc ru ngủ #1",
-            artist: "Nghệ sĩ C",
-            duration: "5:10",
-            category: "Ru ngủ",
-            plays: 210,
-            dateAdded: "12/05/2025",
-        },
-        {
-            id: 4,
-            title: "Âm thanh thiên nhiên #1",
-            artist: "Nghệ sĩ A",
-            duration: "6:30",
-            category: "Thiên nhiên",
-            plays: 180,
-            dateAdded: "10/05/2025",
-        },
-        {
-            id: 5,
-            title: "Âm thanh thiên nhiên #2",
-            artist: "Nghệ sĩ D",
-            duration: "4:55",
-            category: "Thiên nhiên",
-            plays: 150,
-            dateAdded: "08/05/2025",
-        },
-        {
-            id: 6,
-            title: "Bản nhạc ru ngủ #2",
-            artist: "Nghệ sĩ B",
-            duration: "5:45",
-            category: "Ru ngủ",
-            plays: 135,
-            dateAdded: "05/05/2025",
-        },
-        {
-            id: 7,
-            title: "Bản nhạc thư giãn #3",
-            artist: "Nghệ sĩ C",
-            duration: "4:15",
-            category: "Thư giãn",
-            plays: 90,
-            dateAdded: "01/05/2025",
-        },
-    ]
-
+    dataGet: GetList = {
+        PageSize: 6,
+        PageNumber: 1,
+    }
+    musicFiles: AdminSound[] = []
+    convertDate = ConvertDate;
     categories = ["Tất cả thể loại", "Thư giãn", "Ru ngủ", "Thiên nhiên"]
     sortOptions = ["Sắp xếp theo", "Lượt phát", "Ngày thêm", "Tên"]
+    constructor(private soundService: SoundService, private cd: ChangeDetectorRef, private mat: MatDialog) {
+        super(mat);
+        this.soundService = soundService
+    }
+
+    ngOnInit(): void {
+        this.getDataSound(this.dataGet);
+    }
+
+    getDataSound(dataGet: GetList) {
+        this.IsLoading = true;
+        this.soundService.getSoundByAdmin(dataGet).subscribe(
+            (response) => {
+                if (response.isSuccess) {
+                    console.log("Lấy danh sách âm thanh thành công", response.data)
+                    this.musicFiles = response.data.data.map((item) => ({
+                        ...item,
+                        file: this.changeFile(item.content, item.contentType, item.name),
+                    }));
+                    this.TotalPage = response.data.totalPage;
+                    this.CurrentPage = response.data.currentPage;
+                    this.IsLoading = false;
+                    this.cd.detectChanges();
+                } else {
+                    this.IsLoading = false;
+                    console.error("Lỗi khi lấy danh sách âm thanh", response.message)
+                }
+            },
+            (error) => {
+                this.IsLoading = false;
+                console.error("Lỗi khi gọi API", error)
+            }
+        )
+    }
 
     getCategoryClass(category: string): string {
         switch (category) {
@@ -102,6 +70,16 @@ export class MusicManagementComponent {
             default:
                 return ""
         }
+    }
+
+    changeFile(data: any, type: string, name: string): File {
+        const byteArray = new Uint8Array(data);
+
+        const blob = new Blob([byteArray], { type: type });
+
+        const file = new File([blob], name, { type: type });
+
+        return file;
     }
 
     onSearch(event: Event): void {
@@ -120,34 +98,80 @@ export class MusicManagementComponent {
     }
 
     previousPage(): void {
-        if (this.currentPage > 1) {
-            this.currentPage--
+        if (this.CurrentPage > 1) {
+            this.CurrentPage--
         }
     }
 
     nextPage(): void {
-        if (this.currentPage < this.totalPages) {
-            this.currentPage++
+        if (this.CurrentPage < this.TotalPage) {
+            this.CurrentPage++
         }
     }
 
-    playMusic(file: MusicFile): void {
-        console.log(`Playing: ${file.title}`)
+    playMusic(file: AdminSound): void {
+        console.log(`Playing: ${file.name}`)
         // Implement play logic here
     }
 
-    editMusic(file: MusicFile): void {
-        console.log(`Editing: ${file.title}`)
+    editMusic(file: AdminSound): void {
+        console.log(`Editing: ${file.name}`)
         // Implement edit logic here
     }
 
-    deleteMusic(file: MusicFile): void {
-        console.log(`Deleting: ${file.title}`)
+    deleteMusic(file: AdminSound): void {
+        console.log(`Deleting: ${file.name}`)
         // Implement delete logic here
     }
 
     uploadNewFile(): void {
-        console.log("Uploading new file")
-        // Implement upload logic here
+        const data: DataSettingForm = {
+            title: "Thêm âm thanh mới",
+            width: "600px",
+            height: "400px",
+            data: {
+                title: "Thêm âm thanh mới",
+                width: "600px",
+                height: "400px",
+            },
+        }
+        this.showDialog(AddMusicComponent, data).afterClosed().subscribe((result) => {
+            if (result) {
+                console.log("Thêm âm thanh mới thành công", result)
+                this.getDataSound(this.dataGet)
+            } else {
+                console.error("Lỗi khi thêm âm thanh mới")
+            }
+        })
+    }
+
+    getTimeFile(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const audio = document.createElement('audio');
+            audio.preload = 'metadata';
+            const url = URL.createObjectURL(file);
+            audio.src = url;
+
+            audio.onloadedmetadata = () => {
+                URL.revokeObjectURL(url); // dọn bộ nhớ
+
+                const duration = audio.duration;
+                const minutes = Math.floor(duration / 60);
+                const seconds = Math.round(duration % 60).toString().padStart(2, '0');
+                resolve(`${minutes}:${seconds}`);
+            };
+
+            audio.onerror = () => {
+                reject('Không thể đọc metadata của file MP3');
+            };
+        });
+    }
+    goToPage(page: number) {
+        if (page >= 1 && page <= this.TotalPage && page !== this.CurrentPage) {
+            this.IsLoading = true
+            this.CurrentPage = page
+            this.dataGet.PageNumber = page
+            this.getDataSound(this.dataGet)
+        }
     }
 }

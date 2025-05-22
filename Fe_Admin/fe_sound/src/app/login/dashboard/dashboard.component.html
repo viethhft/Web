@@ -27,7 +27,7 @@
         </div>
 
         <nav class="sidebar-nav">
-            <button class="nav-item" [class.active]="activeTab === 'analytics'" (click)="setActiveTab('analytics')">
+            <button class="nav-item" routerLinkActive="active" [routerLink]="['overview']">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -36,7 +36,7 @@
                 <span>Tổng quan</span>
             </button>
 
-            <button class="nav-item" [class.active]="activeTab === 'employees'" (click)="setActiveTab('employees')">
+            <button class="nav-item" routerLinkActive="active" [routerLink]="['employee-management']">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -47,7 +47,7 @@
                 <span>Quản lý nhân viên</span>
             </button>
 
-            <button class="nav-item" [class.active]="activeTab === 'music'" (click)="setActiveTab('music')">
+            <button class="nav-item" routerLinkActive="active" [routerLink]="['music-management']">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 18V5l12-2v13"></path>
@@ -57,7 +57,7 @@
                 <span>Quản lý âm nhạc</span>
             </button>
 
-            <button class="nav-item" [class.active]="activeTab === 'settings'" (click)="setActiveTab('settings')">
+            <button class="nav-item" routerLinkActive="active" [routerLink]="['settings']">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3"></circle>
@@ -151,10 +151,7 @@
 
         <!-- Main content area -->
         <main class="content">
-            <app-overview *ngIf="activeTab === 'analytics'"></app-overview>
-            <app-employee-management *ngIf="activeTab === 'employees'"></app-employee-management>
-            <app-music-management *ngIf="activeTab === 'music'"></app-music-management>
-            <app-settings *ngIf="activeTab === 'settings'"></app-settings>
+            <router-outlet></router-outlet>
         </main>
     </div>
 </div>

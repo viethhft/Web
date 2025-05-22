@@ -129,7 +129,9 @@ namespace Application.Repositories
                                     FileName = reader["FileName"].ToString(),
                                     Content = reader["Content"] as byte[],
                                     ContentType = reader["ContentType"].ToString(),
-                                    NameUserAdd = reader["DisplayName"].ToString()
+                                    NameUserAdd = reader["DisplayName"].ToString(),
+                                    DateCreate = (DateTime)reader["CreateDate"],
+                                    DateUpdate = (DateTime)reader["UpdateDate"]
                                 };
                                 lst.Add(temp);
                             }
@@ -140,33 +142,33 @@ namespace Application.Repositories
                                     totalPage = Convert.ToInt32(reader["TotalPage"]);
                                 }
                             }
+                            if (lst.Count > 0)
+                            {
+                                return new ResponseData<Pagination<AdminSoundDto>>
+                                {
+                                    IsSuccess = true,
+                                    Data = new Pagination<AdminSoundDto>
+                                    {
+                                        TotalPage = totalPage,
+                                        CurrentPage = PageNumber,
+                                        Data = lst,
+                                    }
+                                };
+                            }
+                            else
+                            {
+                                return new ResponseData<Pagination<AdminSoundDto>>
+                                {
+                                    IsSuccess = false,
+                                    Data = new Pagination<AdminSoundDto>
+                                    {
+                                        TotalPage = totalPage,
+                                        CurrentPage = PageNumber,
+                                        Data = new List<AdminSoundDto>(),
+                                    }
+                                };
+                            }
                         }
-                    }
-                    if (lst.Count > 0)
-                    {
-                        return new ResponseData<Pagination<AdminSoundDto>>
-                        {
-                            IsSuccess = true,
-                            Data = new Pagination<AdminSoundDto>
-                            {
-                                TotalPage = totalPage,
-                                CurrentPage = PageNumber,
-                                Data = lst,
-                            }
-                        };
-                    }
-                    else
-                    {
-                        return new ResponseData<Pagination<AdminSoundDto>>
-                        {
-                            IsSuccess = false,
-                            Data = new Pagination<AdminSoundDto>
-                            {
-                                TotalPage = totalPage,
-                                CurrentPage = PageNumber,
-                                Data = new List<AdminSoundDto>(),
-                            }
-                        };
                     }
                 }
                 catch (SqlException ex)
@@ -193,7 +195,7 @@ namespace Application.Repositories
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                         cmd.Parameters.Add("@Name", System.Data.SqlDbType.NVarChar, 50).Value = sound.Name;
-                        cmd.Parameters.Add("@Image", System.Data.SqlDbType.VarChar, 50).Value = sound.Image;
+                        cmd.Parameters.Add("@Image", System.Data.SqlDbType.VarChar, -1).Value = sound.Image;
                         cmd.Parameters.Add("@IdUserAdd", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(_extentions.GetIdForToken(sound.Token));
 
                         cmd.Parameters.Add("@FileName", System.Data.SqlDbType.NVarChar, 50).Value = file.FileName;
@@ -231,7 +233,7 @@ namespace Application.Repositories
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.Add("@Id", System.Data.SqlDbType.BigInt).Value = sound.Id;
                         cmd.Parameters.Add("@Name", System.Data.SqlDbType.NVarChar, 50).Value = sound.Name;
-                        cmd.Parameters.Add("@Image", System.Data.SqlDbType.VarChar, 50).Value = sound.Image;
+                        cmd.Parameters.Add("@Image", System.Data.SqlDbType.VarChar, -1).Value = sound.Image;
                         if (file.Content != null && file.Content.Length > 0)
                         {
                             cmd.Parameters.Add("@FileName", System.Data.SqlDbType.NVarChar, 50).Value = file.FileName;

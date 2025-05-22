@@ -41,36 +41,17 @@
             <table class="music-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Tên bản nhạc</th>
-                        <th>Nghệ sĩ</th>
-                        <th>Thời lượng</th>
-                        <th>Thể loại</th>
-                        <th>Lượt phát</th>
-                        <th>Ngày thêm</th>
                         <th>Thao tác</th>
+                        <th>Ảnh</th>
+                        <th>Tên bản nhạc</th>
+                        <th class="center-cell">Thể loại</th>
+                        <th>Người thêm</th>
+                        <th class="center-cell">Ngày thêm</th>
+                        <th class="center-cell">Ngày cập nhật</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody *ngIf="!IsLoading; else loadingBlock">
                     <tr *ngFor="let file of musicFiles">
-                        <td>{{ file.id }}</td>
-                        <td class="file-title-cell">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="file-icon" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 18V5l12-2v13"></path>
-                                <circle cx="6" cy="18" r="3"></circle>
-                                <circle cx="18" cy="16" r="3"></circle>
-                            </svg>
-                            <span>{{ file.title }}</span>
-                        </td>
-                        <td>{{ file.artist }}</td>
-                        <td>{{ file.duration }}</td>
-                        <td>
-                            <span class="category-badge" [ngClass]="getCategoryClass(file.category)">{{ file.category
-                                }}</span>
-                        </td>
-                        <td>{{ file.plays }}</td>
-                        <td>{{ file.dateAdded }}</td>
                         <td>
                             <div class="action-buttons">
                                 <button class="action-button" (click)="playMusic(file)" title="Phát">
@@ -101,19 +82,58 @@
                                 </button>
                             </div>
                         </td>
+                        <td>
+                            <img class="sound-thumbnail" [src]="file.image" alt="Ảnh đang bị lỗi.....">
+                        </td>
+
+                        <td>
+                            <div class="file-title-cell">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="file-icon" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M9 18V5l12-2v13"></path>
+                                    <circle cx="6" cy="18" r="3"></circle>
+                                    <circle cx="18" cy="16" r="3"></circle>
+                                </svg>
+                                <span>{{ file.name }}</span>
+                            </div>
+                        </td>
+                        <td class="center-cell">
+                            <span class="category-badge" [ngClass]="getCategoryClass(file.name)">{{ file.name
+                                }}</span>
+                        </td>
+                        <td>{{ file.nameUserAdd }}</td>
+
+                        <td class="center-cell">{{ convertDate(file.dateCreate) }}</td>
+                        <td class="center-cell">{{ convertDate(file.dateUpdate) }}</td>
                     </tr>
                 </tbody>
+                <ng-template #loadingBlock>
+                    <tbody>
+                        <tr>
+                            <td colspan="100%" class="text-center">
+                                <div class="table-loading">
+                                    <span class="spinner"></span> Đang tải dữ liệu...
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </ng-template>
             </table>
         </div>
 
-        <div class="table-pagination">
+        <div class="table-pagination" *ngIf="!IsLoading">
             <p class="pagination-info">Hiển thị 1-{{ musicFiles.length }} của {{ musicFiles.length }} file âm nhạc</p>
             <div class="pagination-controls">
-                <button class="pagination-button" [disabled]="currentPage === 1" (click)="previousPage()">
+                <button class="pagination-button" [disabled]="CurrentPage === 1" (click)="previousPage()">
                     Trước
                 </button>
-                <button class="pagination-button active">{{ currentPage }}</button>
-                <button class="pagination-button" [disabled]="currentPage === totalPages" (click)="nextPage()">
+                <button class="pagination-button" *ngFor="let _ of [].constructor(TotalPage); let i = index"
+                    [class.active]="i + 1 === CurrentPage" (click)="goToPage(i + 1)">
+                    {{ i + 1 }}
+                </button>
+
+                <button class="pagination-button" [disabled]="CurrentPage === TotalPage" (click)="nextPage()">
                     Sau
                 </button>
             </div>
