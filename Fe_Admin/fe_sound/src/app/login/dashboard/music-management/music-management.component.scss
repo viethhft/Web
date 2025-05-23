@@ -179,22 +179,16 @@
     font-size: 0.75rem;
     border-radius: 9999px;
 
-    &.category-relaxation {
+    &.category-UnDeleted {
         background-color: rgba(59, 130, 246, 0.3); // blue-500/30
         color: #93c5fd; // blue-300
         border: 1px solid rgba(59, 130, 246, 0.3); // blue-500/30
     }
 
-    &.category-sleep {
+    &.category-Deleted {
         background-color: rgba(139, 92, 246, 0.3); // purple-500/30
         color: #c4b5fd; // purple-300
         border: 1px solid rgba(139, 92, 246, 0.3); // purple-500/30
-    }
-
-    &.category-nature {
-        background-color: rgba(16, 185, 129, 0.3); // green-500/30
-        color: #6ee7b7; // green-300
-        border: 1px solid rgba(16, 185, 129, 0.3); // green-500/30
     }
 }
 
@@ -219,6 +213,16 @@
 
     &.delete-button:hover {
         color: #f87171; // red-400
+    }
+
+    &.active-button {
+        color: #10b981;
+        /* green-500 */
+    }
+
+    &.active-button:hover {
+        color: #059669;
+        /* green-600 */
     }
 }
 

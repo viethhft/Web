@@ -5,7 +5,6 @@ import { MatDialog, MatDialogRef } from "@angular/material/dialog"
 export interface DataSettingForm<T = any> {
     width?: string;
     height?: string;
-    title?: string;
     data?: T;
 }
 @Injectable({ providedIn: 'root' })
@@ -14,6 +13,7 @@ export class BaseModel {
     CurrentPage: number = 0;
     PageSize: number = 0;
     IsLoading: boolean = false;
+    TOKEN_KEY = 'auth_token';
 
     constructor(private dialog?: MatDialog) {
 
@@ -27,11 +27,5 @@ export class BaseModel {
             height: config?.height ?? '400px',
             data: config?.data ?? null,
         });
-    }
-
-    closeDialog(dialogRef: any) {
-        if (dialogRef) {
-            dialogRef.close();
-        }
     }
 }

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../share/Environment/environment';
 import { SoundDto, AdminSoundDto, GetMixSoundDto, CreateMixSoundDto, UpdateMixSoundDto, AddSound, EditSound } from './sound.dtos';
 import { ResponseData, Pagination, GetList } from '../../share/Dtos/Dtos.Share';
-import { toHttpParams } from '../../share/Services/Service.Share';
+import { toFormBody, toHttpParams } from '../../share/Services/Service.Share';
 import { api } from '../../share/Environment/api.link';
 @Injectable({
     providedIn: 'root'
@@ -21,7 +21,7 @@ export class SoundService {
     }
 
     addSound(formData: AddSound): Observable<ResponseData<string>> {
-        return this.http.post<ResponseData<string>>(api.sound.addSound, formData);
+        return this.http.post<ResponseData<string>>(api.sound.addSound, toFormBody(formData));
     }
 
     updateSound(formData: EditSound): Observable<ResponseData<string>> {
@@ -29,9 +29,7 @@ export class SoundService {
     }
 
     deleteSound(idSound: number): Observable<ResponseData<string>> {
-        return this.http.patch<ResponseData<string>>(api.sound.deleteSound, null, {
-            params: toHttpParams({ id: idSound })
-        });
+        return this.http.delete<ResponseData<string>>(api.sound.deleteSound, { params: toHttpParams({ id: idSound }) });
     }
 
     activateSound(idSound: number): Observable<ResponseData<string>> {

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MusicManagementComponent } from './music-management.component';
 import { AddMusicComponent } from './add-music/add-music.component';
-
+import { ToastrModule } from 'ngx-toastr';
 @NgModule({
     declarations: [
         MusicManagementComponent,
@@ -11,7 +11,8 @@ import { AddMusicComponent } from './add-music/add-music.component';
     ],
     imports: [
         CommonModule,
-        FormsModule
+        FormsModule,
+        ToastrModule,
     ],
     exports: [
         MusicManagementComponent,

@@ -13,19 +13,22 @@ export interface AdminSoundDto {
     name: string;
     image: string;
     fileName: string;
-    content: Uint8Array;
+    content: string;
     contentType: string;
     dateCreate: Date;
     dateUpdate: Date;
+    isDeleted: boolean;
 }
 export interface AdminSound {
     id: number;
     nameUserAdd: string;
     name: string;
     image: string;
+    fileName: string;
     file: File;
     dateCreate: Date;
     dateUpdate: Date;
+    isDeleted: boolean;
 }
 
 export interface GetMixSoundDto {
@@ -50,8 +53,8 @@ export interface UpdateMixSoundDto {
 
 export interface AddSound {
     name: string;
-    image: File;
-    file: File;
+    image?: File;
+    file?: File;
     token: string;
 }
 

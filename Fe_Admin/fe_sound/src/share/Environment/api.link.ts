@@ -15,7 +15,7 @@ export const api = {
 
         deleteSound: `${soundBase}/deleteSound`,
 
-        activateSound: `${soundBase}/activateSound`,
+        activateSound: `${soundBase}/activeSound`,
 
         getSoundMix: `${soundBase}/getSoundMix`,
 
@@ -32,7 +32,7 @@ export const api = {
 
         deleteUser: `${userBase}/deleteUser`,
 
-        activateUser: `${userBase}/activateUser`,
+        activateUser: `${userBase}/activeSound`,
 
         login: `${userBase}/login`,
 

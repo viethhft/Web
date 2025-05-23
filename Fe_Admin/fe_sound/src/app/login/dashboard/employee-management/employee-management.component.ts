@@ -1,4 +1,5 @@
-import { Component } from "@angular/core"
+import { Component, OnInit } from "@angular/core"
+import { ToastrService } from 'ngx-toastr'
 
 interface Employee {
     id: number
@@ -13,7 +14,7 @@ interface Employee {
     templateUrl: "./employee-management.component.html",
     styleUrls: ["./employee-management.component.scss"],
 })
-export class EmployeeManagementComponent {
+export class EmployeeManagementComponent implements OnInit {
     searchQuery = ""
     selectedRole = "Tất cả vai trò"
     selectedStatus = "Tất cả trạng thái"
@@ -33,49 +34,60 @@ export class EmployeeManagementComponent {
     roles = ["Tất cả vai trò", "Quản lý", "Nhân viên"]
     statuses = ["Tất cả trạng thái", "Đang hoạt động", "Không hoạt động"]
 
+    constructor(private toastr: ToastrService) {}
+
+    ngOnInit() {
+        // Test toastr
+        setTimeout(() => {
+            this.toastr.success('Test message', 'Test title');
+        }, 1000);
+    }
+
     getStatusClass(status: string): string {
         return status === "Đang hoạt động" ? "status-active" : "status-inactive"
     }
 
     onSearch(event: Event): void {
         this.searchQuery = (event.target as HTMLInputElement).value
-        // Implement search logic here
+        this.toastr.info('Đang tìm kiếm...', 'Thông báo')
     }
 
     onRoleChange(event: Event): void {
         this.selectedRole = (event.target as HTMLSelectElement).value
-        // Implement role filter logic here
+        this.toastr.info(`Đã lọc theo vai trò: ${this.selectedRole}`, 'Thông báo')
     }
 
     onStatusChange(event: Event): void {
         this.selectedStatus = (event.target as HTMLSelectElement).value
-        // Implement status filter logic here
+        this.toastr.info(`Đã lọc theo trạng thái: ${this.selectedStatus}`, 'Thông báo')
     }
 
     previousPage(): void {
         if (this.currentPage > 1) {
             this.currentPage--
+            this.toastr.info(`Đã chuyển đến trang ${this.currentPage}`, 'Thông báo')
         }
     }
 
     nextPage(): void {
         if (this.currentPage < this.totalPages) {
             this.currentPage++
+            this.toastr.info(`Đã chuyển đến trang ${this.currentPage}`, 'Thông báo')
         }
     }
 
     editEmployee(employee: Employee): void {
         console.log(`Editing: ${employee.name}`)
-        // Implement edit logic here
+        this.toastr.info(`Đang chỉnh sửa thông tin: ${employee.name}`, 'Thông báo')
     }
 
     deleteEmployee(employee: Employee): void {
         console.log(`Deleting: ${employee.name}`)
-        // Implement delete logic here
+        this.toastr.warning(`Đã xóa nhân viên: ${employee.name}`, 'Cảnh báo')
     }
 
     addEmployee(): void {
         console.log("Adding new employee")
-        // Implement add employee logic here
+        this.toastr.success('Đã thêm nhân viên mới', 'Thành công')
     }
 }

@@ -5,7 +5,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   margin: 0;
@@ -25,5 +26,150 @@ app-root {
   width: 100vw;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+// styles.scss
+.toast-container {
+  z-index: 9999 !important;
+}
+
+/* Toastr Styles */
+#toast-container {
+  position: fixed !important;
+  z-index: 9999 !important;
+}
+
+#toast-container > div {
+  opacity: 1 !important;
+  position: relative;
+  width: 300px;
+  padding: 15px;
+  margin: 10px;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #fff;
+  font-family: inherit;
+}
+
+.toast-success {
+  background-color: #51a351 !important;
+}
+
+.toast-error {
+  background-color: #bd362f !important;
+}
+
+.toast-info {
+  background-color: #2f96b4 !important;
+}
+
+.toast-warning {
+  background-color: #f89406 !important;
+}
+
+.toast-top-right {
+  top: 12px !important;
+  right: 12px !important;
+  position: fixed !important;
+}
+
+.toast-top-left {
+  top: 12px;
+  left: 12px;
+}
+
+.toast-bottom-right {
+  bottom: 12px;
+  right: 12px;
+}
+
+.toast-bottom-left {
+  bottom: 12px;
+  left: 12px;
+}
+
+.toast-top-center {
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.toast-bottom-center {
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.toast-center-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.toast-close-button {
+  position: relative;
+  right: -0.3em;
+  top: -0.3em;
+  float: right;
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 1px 0 #fff;
+  opacity: 0.8;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.toast-close-button:hover,
+.toast-close-button:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.4;
+}
+
+.toast-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  background-color: #000000;
+  opacity: 0.4;
+}
+
+.toast-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.toast-message {
+  word-wrap: break-word;
+}
+
+/* Animation */
+.toast-enter {
+  transform: translate3d(0, 100%, 0);
+}
+
+.toast-enter-active {
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.3s ease-in;
+}
+
+.toast-exit {
+  transform: translate3d(0, 0, 0);
+}
+
+.toast-exit-active {
+  transform: translate3d(0, 100%, 0);
+  transition: transform 0.3s ease-in;
+}

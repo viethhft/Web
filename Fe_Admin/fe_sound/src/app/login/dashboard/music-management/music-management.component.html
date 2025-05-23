@@ -44,7 +44,7 @@
                         <th>Thao tác</th>
                         <th>Ảnh</th>
                         <th>Tên bản nhạc</th>
-                        <th class="center-cell">Thể loại</th>
+                        <th class="center-cell">Trạng thái</th>
                         <th>Người thêm</th>
                         <th class="center-cell">Ngày thêm</th>
                         <th class="center-cell">Ngày cập nhật</th>
@@ -54,12 +54,22 @@
                     <tr *ngFor="let file of musicFiles">
                         <td>
                             <div class="action-buttons">
-                                <button class="action-button" (click)="playMusic(file)" title="Phát">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
+                                <button class="action-button" (click)="playMusic(file.file,file.id)"
+                                    title="{{ currentFileChoose===file.id ? 'Dừng' : 'Phát' }}">
+                                    <svg *ngIf="audio?.paused || currentFileChoose!==file.id"
+                                        xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                                    </svg>
+                                    <svg *ngIf="!audio?.paused && currentFileChoose===file.id"
+                                        xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <rect x="9" y="8" width="3" height="8"></rect>
+                                        <rect x="14" y="8" width="3" height="8"></rect>
                                     </svg>
                                 </button>
                                 <button class="action-button" (click)="editMusic(file)" title="Chỉnh sửa">
@@ -70,7 +80,8 @@
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                     </svg>
                                 </button>
-                                <button class="action-button delete-button" (click)="deleteMusic(file)" title="Xóa">
+                                <button *ngIf="!file.isDeleted" class="action-button delete-button"
+                                    (click)="deleteMusic(file)" title="Xóa">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round">
@@ -80,6 +91,16 @@
                                         </path>
                                     </svg>
                                 </button>
+
+                                <button *ngIf="file.isDeleted" class="action-button active-button"
+                                    (click)="activeMusic(file)" title="Kích hoạt">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M5 13l4 4L19 7" /> <!-- check icon -->
+                                    </svg>
+                                </button>
+
                             </div>
                         </td>
                         <td>
@@ -99,8 +120,9 @@
                             </div>
                         </td>
                         <td class="center-cell">
-                            <span class="category-badge" [ngClass]="getCategoryClass(file.name)">{{ file.name
-                                }}</span>
+                            <span class="category-badge"
+                                [ngClass]="file.isDeleted ? 'category-Deleted' : 'category-UnDeleted'">
+                                {{ file.isDeleted ? 'Ngưng hoạt động' : 'Đang hoạt động' }} </span>
                         </td>
                         <td>{{ file.nameUserAdd }}</td>
 

@@ -8,7 +8,6 @@ using Data.Common;
 using System.Data;
 using Sound.Application.Extentions;
 
-
 namespace Application.Repositories
 {
     public class SoundRepo : ISoundRepo
@@ -127,11 +126,12 @@ namespace Application.Repositories
                                     Image = reader["Image"].ToString(),
                                     Id = (long)reader["Id"],
                                     FileName = reader["FileName"].ToString(),
-                                    Content = reader["Content"] as byte[],
+                                    Content = Convert.ToBase64String(reader["Content"] as byte[]),
                                     ContentType = reader["ContentType"].ToString(),
                                     NameUserAdd = reader["DisplayName"].ToString(),
                                     DateCreate = (DateTime)reader["CreateDate"],
-                                    DateUpdate = (DateTime)reader["UpdateDate"]
+                                    DateUpdate = (DateTime)reader["UpdateDate"],
+                                    IsDeleted = (bool)reader["IsDeleted"],
                                 };
                                 lst.Add(temp);
                             }

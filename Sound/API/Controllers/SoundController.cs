@@ -85,7 +85,7 @@ namespace API.Controllers
                 string image = "";
 
                 content = await _extentions.CompressMp3Async(sound.File);
-
+    
                 using (var ms = new MemoryStream())
                 {
                     await sound.Image.CopyToAsync(ms);

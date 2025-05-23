@@ -58,7 +58,6 @@ namespace Sound.Application.Extentions
             {
                 throw new Exception($"FFmpeg exited with code {ffmpeg.ExitCode}. Error: {errorLog}");
             }
-
             return msOutput.ToArray();
         }
 

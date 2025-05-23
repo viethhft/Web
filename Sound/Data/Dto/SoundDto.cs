@@ -18,7 +18,8 @@ namespace Data.Dto
         public string Name { get; set; }
         public string Image { get; set; }
         public string FileName { get; set; } = string.Empty;
-        public byte[] Content { get; set; } = Array.Empty<byte>();
+        public string Content { get; set; }
+        public bool IsDeleted { get; set; }
         public string ContentType { get; set; } = "audio/mpeg";
         public DateTime DateCreate { get; set; }
         public DateTime DateUpdate { get; set; }
