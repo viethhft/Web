@@ -3,7 +3,7 @@ import { NgForm } from "@angular/forms"
 import { BaseModel } from "../../../../../share/Dtos/Base.model"
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { SoundService } from "../../../../../services/sound/sound.service";
-import { AddSound } from "../../../../../services/sound/sound.dtos";
+import { AddSound, EditSound } from "../../../../../services/sound/sound.dtos";
 @Component({
     selector: "app-add-music",
     templateUrl: "./add-music.component.html",
@@ -20,6 +20,12 @@ export class AddMusicComponent extends BaseModel implements OnInit {
         image: undefined,
         file: undefined,
         token: "",
+    }
+    editMucic: EditSound = {
+        id: -1,
+        name: "",
+        file: undefined,
+        image: undefined,
     }
 
     constructor(private dialogRef: MatDialogRef<AddMusicComponent>,
@@ -76,22 +82,47 @@ export class AddMusicComponent extends BaseModel implements OnInit {
         if (form.valid && this.musicFile) {
             this.IsLoading = true;
             this.music.token = localStorage.getItem(this.TOKEN_KEY) || "";
+            if (this.data.status) {
 
-            this.soundService.addSound(this.music).subscribe(
-                (response) => {
-                    if (response.isSuccess) {
+                this.soundService.addSound(this.music).subscribe(
+                    (response) => {
+                        if (response.isSuccess) {
 
-                        this.closeModal("Thêm âm thanh thành công", true);
-                    } else {
-                        console.error("Lỗi khi thêm âm thanh", response.message)
+                            this.closeModal("Thêm âm thanh thành công", true);
+                        } else {
+                            console.error("Lỗi khi thêm âm thanh", response.message)
+                            this.IsLoading = false
+                        }
+                    },
+                    (error) => {
+                        console.error("Lỗi khi gọi API", error)
                         this.IsLoading = false
                     }
-                },
-                (error) => {
-                    console.error("Lỗi khi gọi API", error)
-                    this.IsLoading = false
-                }
-            );
+                );
+            }
+            else {
+                this.editMucic = {
+                    ...this.music,
+                    id: this.data.file.id
+                };
+                console.log(this.editMucic);
+
+                this.soundService.updateSound(this.editMucic).subscribe(
+                    (response) => {
+                        if (response.isSuccess) {
+
+                            this.closeModal("Thêm âm thanh thành công", true);
+                        } else {
+                            console.error("Lỗi khi thêm âm thanh", response.message)
+                            this.IsLoading = false
+                        }
+                    },
+                    (error) => {
+                        console.error("Lỗi khi gọi API", error)
+                        this.IsLoading = false
+                    }
+                );
+            }
         }
     }
 

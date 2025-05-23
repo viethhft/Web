@@ -94,7 +94,7 @@
                     <button type="button" class="cancel-button"
                         (click)="closeModal('Người dùng đã huỷ thêm âm thanh')">Hủy</button>
                     <button type="submit" class="submit-button" [disabled]="IsLoading">
-                        {{ IsLoading ? 'Đang tải lên...' : 'Tải lên' }}
+                        {{ IsLoading ? 'Đang tải lên...' : data.status?'Tải lên' :'Lưu'}}
                     </button>
                 </div>
             </form>

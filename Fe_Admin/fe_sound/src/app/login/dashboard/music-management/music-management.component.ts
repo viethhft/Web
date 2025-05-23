@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from "@angular/core"
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from "@angular/core"
 import { SoundService } from "../../../../services/sound/sound.service"
 import { ConvertDate } from "../../../../share/Services/Extentions"
 import { GetList } from "../../../../share/Dtos/Dtos.Share"
@@ -23,6 +23,11 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
     musicFiles: AdminSound[] = [];
     audio: HTMLAudioElement | null = null;
     currentFileChoose: number = -1;
+    currentTime = 0;
+    duration = 0;
+    urlAudioPlaying?: string = "";
+    nameAudioPlaying?: string = "";
+    hideAudio: boolean = false;
     convertDate = ConvertDate;
     categories = ["Tất cả", "Đang hoạt động", "Ngừng hoạt động"]
     sortOptions = ["Sắp xếp theo", "Ngày thêm", "Tên"]
@@ -99,46 +104,105 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
         }
     }
 
-    playMusic(file: File, index: number): void {
-        debugger
-        if (this.audio && index === this.currentFileChoose) {
+    playMusic(file: AdminSound): void {
+        this.urlAudioPlaying = this.musicFiles.find(c => c.id === file.id)?.image;
+        this.nameAudioPlaying = this.musicFiles.find(c => c.id === file.id)?.name;
+        if (this.audio && file.id === this.currentFileChoose) {
             if (!this.audio.paused)
                 this.audio.pause();
-            else
+            else {
+                this.hideAudio = false;
                 this.audio.play();
+            }
             this.cd.detectChanges();
             return;
 
         }
-        else if (this.audio && index !== this.currentFileChoose) {
-            this.audio = new Audio(URL.createObjectURL(file));
+        else if (this.audio && file.id !== this.currentFileChoose) {
+            this.audio.pause();
+            this.hideAudio = false;
+            this.audio = new Audio(URL.createObjectURL(file.file));
             this.audio.onended = () => {
                 this.audio = null;
             };
+            this.audio.addEventListener('timeupdate', () => {
+                this.currentTime = this.audio!.currentTime;
+            });
+
+            this.audio.addEventListener('loadedmetadata', () => {
+                this.duration = this.audio!.duration;
+            });
+
+            this.audio.addEventListener('ended', () => {
+                this.currentTime = 0;
+            });
         }
         else {
-            this.audio = new Audio(URL.createObjectURL(file));
+            this.audio = new Audio(URL.createObjectURL(file.file));
             this.audio.onended = () => {
                 this.audio = null;
             };
+            this.audio.addEventListener('timeupdate', () => {
+                this.currentTime = this.audio!.currentTime;
+            });
+
+            this.audio.addEventListener('loadedmetadata', () => {
+                this.duration = this.audio!.duration;
+            });
+
+            this.audio.addEventListener('ended', () => {
+                this.currentTime = 0;
+            });
         }
-        if (this.currentFileChoose === index) {
+        if (this.currentFileChoose === file.id) {
             this.audio.pause();
             this.currentFileChoose = -1;
         } else {
             this.audio.play().catch(err => console.error(err));
-            this.currentFileChoose = index;
+            this.currentFileChoose = file.id;
         }
         this.cd.detectChanges();
     }
 
+    formatTime(seconds: number): string {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${this.pad(mins)}:${this.pad(secs)}`;
+    }
+
+    pad(num: number): string {
+        return num < 10 ? '0' + num : '' + num;
+    }
+
+    seek(event: MouseEvent) {
+        const container = event.currentTarget as HTMLElement;
+        const rect = container.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const ratio = clickX / rect.width;
+        this.audio!.currentTime = ratio * this.duration;
+    }
+
+    hideFormAudio() {
+        this.hideAudio = !this.hideAudio;
+        this.cd.detectChanges();
+    }
+
+    continuteAction() {
+        if (this.audio?.paused) {
+            this.audio.play();
+        }
+        else {
+            this.audio!.pause();
+        }
+    }
     editMusic(file: AdminSound): void {
         const data: DataSettingForm = {
             width: "600px",
             height: "400px",
             data: {
                 file: file,
-                title: "Sửa âm thanh"
+                title: "Sửa âm thanh",
+                status: false
             },
         }
         this.showDialog(AddMusicComponent, data).afterClosed().subscribe((result) => {
@@ -197,6 +261,7 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
             height: "400px",
             data: {
                 title: "Thêm âm thanh mới",
+                status: true,
             },
         }
         this.showDialog(AddMusicComponent, data).afterClosed().subscribe((result) => {

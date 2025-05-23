@@ -54,7 +54,7 @@
                     <tr *ngFor="let file of musicFiles">
                         <td>
                             <div class="action-buttons">
-                                <button class="action-button" (click)="playMusic(file.file,file.id)"
+                                <button class="action-button" (click)="playMusic(file)"
                                     title="{{ currentFileChoose===file.id ? 'Dừng' : 'Phát' }}">
                                     <svg *ngIf="audio?.paused || currentFileChoose!==file.id"
                                         xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
@@ -161,4 +161,29 @@
             </div>
         </div>
     </div>
+</div>
+<div class="audio-rect-container" *ngIf="audio && !hideAudio">
+    <div class="audio-rect-disc">
+        <img [src]="urlAudioPlaying" class="audio-rect-img" alt="disc" />
+        <span class="audio-rect-title">{{ nameAudioPlaying }}</span>
+    </div>
+
+    <div class="audio-rect-info">
+        <div class="audio-rect-player">
+            <button class="audio-rect-play-btn" (click)="continuteAction()">
+                <p style="margin-left:3px; margin-top: 8px;">{{ !audio.paused ? '⏸' : '▶' }}</p>
+            </button>
+
+            <div class="progress-container" (click)="seek($event)">
+                <div class="audio-rect-bar" [style.width.%]="(currentTime / duration) * 100"></div>
+                <div class="audio-rect-thumb" [style.left.%]="(currentTime / duration) * 100"></div>
+            </div>
+
+            <span class="time-text">
+                {{ formatTime(currentTime) }} / {{ formatTime(duration) }}
+            </span>
+        </div>
+    </div>
+
+    <button class="audio-rect-close" (click)="hideFormAudio()">×</button>
 </div>
