@@ -24,8 +24,8 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
     audio: HTMLAudioElement | null = null;
     currentFileChoose: number = -1;
     convertDate = ConvertDate;
-    categories = ["Tất cả thể loại", "Thư giãn", "Ru ngủ", "Thiên nhiên"]
-    sortOptions = ["Sắp xếp theo", "Lượt phát", "Ngày thêm", "Tên"]
+    categories = ["Tất cả", "Đang hoạt động", "Ngừng hoạt động"]
+    sortOptions = ["Sắp xếp theo", "Ngày thêm", "Tên"]
     constructor(private soundService: SoundService, private cd: ChangeDetectorRef, private mat: MatDialog, private logService: ToastrService) {
         super(mat);
         this.soundService = soundService
@@ -80,7 +80,6 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
 
     onCategoryChange(event: Event): void {
         this.selectedCategory = (event.target as HTMLSelectElement).value
-        // Implement category filter logic here
     }
 
     onSortChange(event: Event): void {

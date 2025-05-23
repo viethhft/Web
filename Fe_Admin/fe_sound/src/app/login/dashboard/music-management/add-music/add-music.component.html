@@ -22,7 +22,6 @@
                     </div>
                 </div>
 
-
                 <div class="form-group">
                     <label for="icon">Icon <span class="required">*</span></label>
                     <div class="file-upload-container">
@@ -51,26 +50,45 @@
                     </div>
                 </div>
 
-                <div class="file-upload-area" [class.has-file]="musicFile"
-                    [class.error]="musicForm.submitted && !musicFile">
+                <div class="form-group">
+                    <label for="music">File âm thanh <span class="required">*</span></label>
 
-                    <!-- input ẩn đi nhưng vẫn trigger được -->
-                    <input type="file" id="music" name="music" accept="audio/*" (change)="onMusicFileSelected($event)"
-                        class="file-input" [class.disabled]="musicFile">
+                    <div class="test">
+                        <!-- Khu vực upload -->
+                        <div class="file-upload-area" [class.has-file]="musicFile"
+                            [class.error]="musicForm.submitted && !musicFile" style="position: relative;">
 
-                    <div *ngIf="!musicFile" class="file-upload-content">
-                        <!-- SVG + text -->
+                            <input type="file" id="music" name="music" accept="audio/*"
+                                (change)="onMusicFileSelected($event)" class="file-input"
+                                [class.disabled]="musicFile" />
+
+                            <!-- Phần nội dung hiển thị khi chưa có file -->
+                            <div class="file-upload-content" *ngIf="!musicFile">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="upload-icon" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <p class="upload-text">Kéo thả file hoặc click để chọn</p>
+                                <p class="upload-hint">Hỗ trợ các định dạng: MP3, WAV, OGG</p>
+                            </div>
+                        </div>
+
+                        <!-- Preview nằm ngoài khu vực upload -->
+                        <div *ngIf="musicFile && musicPreviewUrl" class="audio-preview-wrapper">
+                            <audio controls class="audio-preview">
+                                <source [src]="musicPreviewUrl" [type]="musicFile.type" />
+                                Trình duyệt không hỗ trợ phát âm thanh.
+                            </audio>
+                        </div>
                     </div>
 
-                    <!-- ✅ phần preview audio bên trong cùng khung -->
-                    <div *ngIf="musicFile && musicPreviewUrl" class="audio-preview">
-                        <audio controls>
-                            <source [src]="musicPreviewUrl" [type]="musicFile.type" />
-                            Trình duyệt không hỗ trợ phát âm thanh.
-                        </audio>
+                    <div class="error-message" *ngIf="musicForm.submitted && !musicFile">
+                        Vui lòng chọn file âm thanh
                     </div>
                 </div>
-
 
                 <div class="form-actions">
                     <button type="button" class="cancel-button"

@@ -14,7 +14,6 @@ export class AddMusicComponent extends BaseModel implements OnInit {
     musicFile: File | null = null
     musicPreviewUrl: string | null = null
     iconPreviewUrl: string | null = null
-    categories = ["Thư giãn", "Ru ngủ", "Thiên nhiên"]
 
     music: AddSound = {
         name: "",
@@ -31,6 +30,7 @@ export class AddMusicComponent extends BaseModel implements OnInit {
     ngOnInit(): void {
         if (this.data.file) {
             const fileData = this.data.file;
+            this.music.name = fileData.name;
             this.iconPreviewUrl = fileData.image;
             const iconBlob = new Blob([fileData.audioData], { type: 'image/png' }); // hoặc 'audio/mp3'
             this.iconFile = new File([iconBlob], fileData.audioName, { type: 'image/png' });
