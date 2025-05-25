@@ -93,14 +93,18 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
     }
 
     previousPage(): void {
+        debugger
         if (this.CurrentPage > 1) {
-            this.CurrentPage--
+            const page = this.CurrentPage - 1;
+            this.goToPage(page);
         }
     }
 
     nextPage(): void {
+        debugger
         if (this.CurrentPage < this.TotalPage) {
-            this.CurrentPage++
+            const page = this.CurrentPage + 1;
+            this.goToPage(page);
         }
     }
 
