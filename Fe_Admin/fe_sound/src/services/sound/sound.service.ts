@@ -25,7 +25,7 @@ export class SoundService {
     }
 
     updateSound(formData: EditSound): Observable<ResponseData<string>> {
-        return this.http.put<ResponseData<string>>(api.sound.updateSound, formData);
+        return this.http.put<ResponseData<string>>(api.sound.updateSound, toFormBody(formData));
     }
 
     deleteSound(idSound: number): Observable<ResponseData<string>> {
