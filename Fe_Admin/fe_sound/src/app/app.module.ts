@@ -12,6 +12,7 @@ import { LoginModule } from "./login/login.module"
 import { ShareModule } from "../share/Component/share.module"
 import { HttpClientModule } from "@angular/common/http"
 import { AuthInterceptor } from "./interceptors/auth.interceptor"
+import { CookieService } from "ngx-cookie-service"
 
 @NgModule({
     declarations: [
@@ -41,7 +42,8 @@ import { AuthInterceptor } from "./interceptors/auth.interceptor"
             provide: HTTP_INTERCEPTORS,
             useClass: AuthInterceptor,
             multi: true
-        }
+        },
+        CookieService
     ],
     bootstrap: [AppComponent],
 })

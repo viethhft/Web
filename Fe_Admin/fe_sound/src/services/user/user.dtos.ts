@@ -49,6 +49,14 @@ export interface ActionDto {
     idUser: string;
     token: string;
 }
+export class ActionDto {
+    idUser: string;
+    token: string;
+    constructor(idUser: string, token: string) {
+        this.idUser = idUser;
+        this.token = token;
+    }
+}
 
 export interface UserDto {
     id: string;
@@ -65,4 +73,11 @@ export interface UserDto {
 export interface RoleDto {
     id: string;
     name: string;
+}
+
+export interface ProfileUserDto {
+    name: string;
+    displayName: string;
+    phoneNumber: string;
+    email: string;
 }

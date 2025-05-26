@@ -81,7 +81,7 @@ export class AddMusicComponent extends BaseModel implements OnInit {
         form.form.markAllAsTouched();
         if (form.valid && this.musicFile) {
             this.IsLoading = true;
-            this.music.token = localStorage.getItem(this.TOKEN_KEY) || "";
+            this.music.token = this.getCurrentToken();
             if (this.data.status) {
 
                 this.soundService.addSound(this.music).subscribe(

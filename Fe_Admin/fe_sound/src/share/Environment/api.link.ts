@@ -32,7 +32,7 @@ export const api = {
 
         deleteUser: `${userBase}/deleteUser`,
 
-        activateUser: `${userBase}/activeSound`,
+        activateUser: `${userBase}/activeUser`,
 
         login: `${userBase}/login`,
 
@@ -47,5 +47,6 @@ export const api = {
         forgotPassword: `${userBase}/forgotPassword`,
 
         changeForgotPassword: `${userBase}/changeForgotPassword`,
+        getProfile: `${userBase}/GetProfileUser`,
     },
 }

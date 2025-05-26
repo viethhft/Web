@@ -171,7 +171,7 @@
     <div class="audio-rect-info">
         <div class="audio-rect-player">
             <button class="audio-rect-play-btn" (click)="continuteAction()">
-                <p style="margin-left:3px; margin-top: 8px;">{{ !audio.paused ? '⏸' : '▶' }}</p>
+                {{ !audio.paused ? '⏸' : '▶' }}
             </button>
 
             <div class="progress-container" (click)="seek($event)">

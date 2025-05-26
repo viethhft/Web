@@ -7,24 +7,24 @@ import { SettingsModule } from './settings/settings.module';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { FormsModule } from '@angular/forms';
 import { MusicManagementModule } from './music-management/music-management.module';
+import { EmployeeManagementModule } from './employee-management/employee-management.module';
 
 @NgModule({
     declarations: [
         DashboardComponent,
         OverviewComponent,
-        EmployeeManagementComponent
     ],
     imports: [
         CommonModule,
         SettingsModule,
         DashboardRoutingModule,
         FormsModule,
-        MusicManagementModule
+        MusicManagementModule,
+        EmployeeManagementModule
     ],
     exports: [
         DashboardComponent,
         OverviewComponent,
-        EmployeeManagementComponent
     ]
 })
 export class DashboardModule { } 

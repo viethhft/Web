@@ -1,4 +1,4 @@
-import { Component } from "@angular/core"
+import { Component, OnInit } from "@angular/core"
 import { Router } from "@angular/router"
 import { AuthService } from "../../services/auth.service"
 @Component({
@@ -6,10 +6,16 @@ import { AuthService } from "../../services/auth.service"
     templateUrl: "./dashboard.component.html",
     styleUrls: ["./dashboard.component.scss"],
 })
-export class DashboardComponent {
-    activeTab = "analytics"
+export class DashboardComponent implements OnInit {
 
-    constructor(private authService: AuthService) { }
+    activeTab = "analytics"
+    name: string = '';
+    constructor(private authService: AuthService) {
+
+    }
+    ngOnInit(): void {
+        this.name = localStorage.getItem("name") || "";
+    }
 
     setActiveTab(tab: string) {
         this.activeTab = tab

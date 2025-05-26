@@ -1,16 +1,16 @@
-import { Component } from "@angular/core"
+import { Component, OnInit } from "@angular/core"
 import { LoginDto } from "../../services/user/user.dtos"
-import { AuthService } from "../../app/services/auth.service"
+import { AuthService } from "../services/auth.service"
 import { NgForm } from '@angular/forms';
-import { CookieService } from 'ngx-cookie-service';
 import { Router } from "@angular/router";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
     selector: "app-login",
     templateUrl: './login.component.html',
     styleUrls: ["./login.component.scss"],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
     userLogin: LoginDto = {
         name: null,
         password: null,
@@ -19,7 +19,13 @@ export class LoginComponent {
     showPassword = false
     errorMessage?: string;
 
-    constructor(private authService: AuthService, private cookieService: CookieService, private router: Router) { }
+    constructor(private authService: AuthService, private router: Router, private toastr: ToastrService) { }
+
+    ngOnInit(): void {
+        if (this.authService.isAuthenticated()) {
+            this.router.navigate(['/admin/dashboard']);
+        }
+    }
 
     onSubmit(form: NgForm) {
         if (form.valid) {
@@ -28,12 +34,9 @@ export class LoginComponent {
                 (response) => {
                     this.isLoading = false;
                     if (response.isSuccess) {
-                        console.log("Login successful", response);
-                        alert(response.message);
-                        this.cookieService.set('tk', response.data, 1);
+                        this.toastr.success(response.message);
                         this.errorMessage = undefined;
-                        // Navigate to dashboard with the correct path
-                        this.router.navigate(['/admin/dashboard']);
+                        window.location.href = '/admin/dashboard';
                     }
                     else {
                         this.errorMessage = response.message;

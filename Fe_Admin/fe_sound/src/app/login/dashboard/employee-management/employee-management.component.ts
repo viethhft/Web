@@ -1,93 +1,168 @@
-import { Component, OnInit } from "@angular/core"
-import { ToastrService } from 'ngx-toastr'
-
-interface Employee {
-    id: number
-    name: string
-    email: string
-    role: string
-    status: string
-}
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
+import { AddEmployeeComponent } from './add-employee/add-employee.component';
+import { UserService } from '../../../../services/user/user.service';
+import { GetList } from '../../../../share/Dtos/Dtos.Share';
+import { ActionDto, UserDto } from '../../../../services/user/user.dtos';
+import { BaseModel, DataSettingForm } from '../../../../share/Dtos/Base.model';
+import { CookieService } from 'ngx-cookie-service';
+import { Action } from 'rxjs/internal/scheduler/Action';
 
 @Component({
-    selector: "app-employee-management",
-    templateUrl: "./employee-management.component.html",
-    styleUrls: ["./employee-management.component.scss"],
+    selector: 'app-employee-management',
+    templateUrl: './employee-management.component.html',
+    styleUrls: ['./employee-management.component.scss']
 })
-export class EmployeeManagementComponent implements OnInit {
-    searchQuery = ""
-    selectedRole = "Tất cả vai trò"
-    selectedStatus = "Tất cả trạng thái"
-    currentPage = 1
-    totalPages = 1
+export class EmployeeManagementComponent extends BaseModel implements OnInit {
+    searchQuery = "";
+    selectedRole = "Tất cả vai trò";
+    selectedStatus = "Tất cả trạng thái";
+    currentPage = 1;
+    totalPages = 1;
+    dataGet: GetList = {
+        PageNumber: 1,
+        PageSize: 10
+    };
 
-    employees: Employee[] = [
-        { id: 1, name: "Nguyễn Văn A", email: "nguyenvana@example.com", role: "Quản lý", status: "Đang hoạt động" },
-        { id: 2, name: "Trần Thị B", email: "tranthib@example.com", role: "Nhân viên", status: "Đang hoạt động" },
-        { id: 3, name: "Lê Văn C", email: "levanc@example.com", role: "Nhân viên", status: "Đang hoạt động" },
-        { id: 4, name: "Phạm Thị D", email: "phamthid@example.com", role: "Nhân viên", status: "Không hoạt động" },
-        { id: 5, name: "Hoàng Văn E", email: "hoangvane@example.com", role: "Nhân viên", status: "Đang hoạt động" },
-        { id: 6, name: "Ngô Thị F", email: "ngothif@example.com", role: "Nhân viên", status: "Đang hoạt động" },
-        { id: 7, name: "Đỗ Văn G", email: "dovang@example.com", role: "Nhân viên", status: "Không hoạt động" },
-    ]
+    listUser: UserDto[] = [];
 
-    roles = ["Tất cả vai trò", "Quản lý", "Nhân viên"]
-    statuses = ["Tất cả trạng thái", "Đang hoạt động", "Không hoạt động"]
+    roles = ["Tất cả vai trò", "Quản lý", "Nhân viên"];
+    statuses = ["Tất cả trạng thái", "Đang hoạt động", "Không hoạt động"];
 
-    constructor(private toastr: ToastrService) {}
-
-    ngOnInit() {
-        // Test toastr
-        setTimeout(() => {
-            this.toastr.success('Test message', 'Test title');
-        }, 1000);
+    constructor(
+        private toastr: ToastrService,
+        private userService: UserService,
+        dialog: MatDialog,
+        cookieService: CookieService,
+        private cd: ChangeDetectorRef
+    ) {
+        super(dialog, cookieService);
     }
 
-    getStatusClass(status: string): string {
-        return status === "Đang hoạt động" ? "status-active" : "status-inactive"
+    ngOnInit(): void {
+        this.getListUser(this.dataGet);
+    }
+
+    getListUser(data: GetList) {
+        this.IsLoading;
+        this.userService.getListUser(data).subscribe(
+            (response) => {
+                if (response.isSuccess) {
+                    this.listUser = response.data.data;
+                    this.currentPage = response.data.currentPage;
+                    this.totalPages = response.data.totalPage;
+                    this.cd.detectChanges();
+                    this.IsLoading = false;
+                }
+            }, (error) => {
+                console.log(error);
+                this.IsLoading = false;
+            }
+        );
+    }
+
+    getStatusDeleteClass(status: boolean): string {
+        return status === false ? "status-active" : "status-inactive";
+    }
+
+    getStatusConfirmClass(status: boolean): string {
+        return status === true ? "status-active" : "status-inactive";
     }
 
     onSearch(event: Event): void {
-        this.searchQuery = (event.target as HTMLInputElement).value
-        this.toastr.info('Đang tìm kiếm...', 'Thông báo')
+        this.searchQuery = (event.target as HTMLInputElement).value;
+        this.toastr.info('Đang tìm kiếm...', 'Thông báo');
     }
 
     onRoleChange(event: Event): void {
-        this.selectedRole = (event.target as HTMLSelectElement).value
-        this.toastr.info(`Đã lọc theo vai trò: ${this.selectedRole}`, 'Thông báo')
+        this.selectedRole = (event.target as HTMLSelectElement).value;
+        this.toastr.info(`Đã lọc theo vai trò: ${this.selectedRole}`, 'Thông báo');
     }
 
     onStatusChange(event: Event): void {
-        this.selectedStatus = (event.target as HTMLSelectElement).value
-        this.toastr.info(`Đã lọc theo trạng thái: ${this.selectedStatus}`, 'Thông báo')
+        this.selectedStatus = (event.target as HTMLSelectElement).value;
+        this.toastr.info(`Đã lọc theo trạng thái: ${this.selectedStatus}`, 'Thông báo');
     }
 
     previousPage(): void {
-        if (this.currentPage > 1) {
-            this.currentPage--
-            this.toastr.info(`Đã chuyển đến trang ${this.currentPage}`, 'Thông báo')
+        if (this.CurrentPage > 1) {
+            const page = this.CurrentPage - 1;
+            this.goToPage(page);
         }
     }
 
     nextPage(): void {
-        if (this.currentPage < this.totalPages) {
-            this.currentPage++
-            this.toastr.info(`Đã chuyển đến trang ${this.currentPage}`, 'Thông báo')
+        if (this.CurrentPage < this.TotalPage) {
+            const page = this.CurrentPage + 1;
+            this.goToPage(page);
         }
     }
 
-    editEmployee(employee: Employee): void {
-        console.log(`Editing: ${employee.name}`)
-        this.toastr.info(`Đang chỉnh sửa thông tin: ${employee.name}`, 'Thông báo')
+    goToPage(page: number) {
+        if (page >= 1 && page <= this.TotalPage && page !== this.CurrentPage) {
+            this.IsLoading = true
+            this.CurrentPage = page
+            this.dataGet.PageNumber = page
+            this.getListUser(this.dataGet)
+        }
     }
 
-    deleteEmployee(employee: Employee): void {
-        console.log(`Deleting: ${employee.name}`)
-        this.toastr.warning(`Đã xóa nhân viên: ${employee.name}`, 'Cảnh báo')
+    deleteEmployee(employee: UserDto): void {
+        let action = new ActionDto(employee.id, this.getCurrentToken());
+        this.userService.deleteUser(action).subscribe(
+            (response) => {
+                if (response.isSuccess) {
+                    this.toastr.success(response.message, 'Thông báo');
+                    this.getListUser(this.dataGet);
+                } else {
+                    this.toastr.error(response.message || 'Có lỗi xảy ra khi xóa nhân viên', 'Lỗi');
+                }
+            }
+            , (error) => {
+                this.toastr.error('Có lỗi xảy ra khi xóa nhân viên', 'Lỗi');
+                console.error('Error:', error);
+            }
+        );
+    }
+
+    activeEmployee(employee: UserDto): void {
+        let action = new ActionDto(employee.id, this.getCurrentToken());
+        this.userService.activateUser(action).subscribe(
+            (response) => {
+                if (response.isSuccess) {
+                    this.toastr.success(response.message, 'Thông báo');
+                    this.getListUser(this.dataGet);
+                } else {
+                    this.toastr.error(response.message || 'Có lỗi xảy ra khi xóa nhân viên', 'Lỗi');
+                }
+            }
+            , (error) => {
+                this.toastr.error('Có lỗi xảy ra khi kích hoạt nhân viên', 'Lỗi');
+                console.error('Error:', error);
+            }
+        );
     }
 
     addEmployee(): void {
-        console.log("Adding new employee")
-        this.toastr.success('Đã thêm nhân viên mới', 'Thành công')
+        const data: DataSettingForm = {
+            width: "600px",
+            height: "400px",
+            data: {
+                title: "Thêm nhân viên mới",
+                status: true,
+            },
+        };
+        this.showDialog(AddEmployeeComponent, data).afterClosed().subscribe((result) => {
+            if (result) {
+                if (result.load) {
+                    this.listUser = [];
+                    this.dataGet.PageNumber = 1;
+                    this.getListUser(this.dataGet);
+                }
+            } else {
+                console.error("Lỗi khi thêm âm thanh mới");
+            }
+        });
     }
 }

@@ -47,7 +47,7 @@ body {
   z-index: 9999 !important;
 }
 
-#toast-container > div {
+#toast-container>div {
   opacity: 1 !important;
   position: relative;
   width: 300px;
@@ -172,4 +172,10 @@ body {
 .toast-exit-active {
   transform: translate3d(0, 100%, 0);
   transition: transform 0.3s ease-in;
+}
+
+.error-message {
+  color: #f87171; // red-400
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
 }

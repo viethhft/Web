@@ -7,6 +7,7 @@ import { BaseModel, DataSettingForm } from "../../../../share/Dtos/Base.model"
 import { AddMusicComponent } from "./add-music/add-music.component"
 import { MatDialog } from "@angular/material/dialog"
 import { ToastrService } from "ngx-toastr"
+import { CookieService } from "ngx-cookie-service"
 @Component({
     selector: "app-music-management",
     templateUrl: "./music-management.component.html",
@@ -31,8 +32,10 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
     convertDate = ConvertDate;
     categories = ["Tất cả", "Đang hoạt động", "Ngừng hoạt động"]
     sortOptions = ["Sắp xếp theo", "Ngày thêm", "Tên"]
-    constructor(private soundService: SoundService, private cd: ChangeDetectorRef, private mat: MatDialog, private logService: ToastrService) {
-        super(mat);
+    constructor(private soundService: SoundService, private cd: ChangeDetectorRef, private mat: MatDialog, private logService: ToastrService,
+        private cookieService: CookieService
+    ) {
+        super(mat, cookieService);
         this.soundService = soundService
     }
 
@@ -93,7 +96,6 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
     }
 
     previousPage(): void {
-        debugger
         if (this.CurrentPage > 1) {
             const page = this.CurrentPage - 1;
             this.goToPage(page);
@@ -101,7 +103,6 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
     }
 
     nextPage(): void {
-        debugger
         if (this.CurrentPage < this.TotalPage) {
             const page = this.CurrentPage + 1;
             this.goToPage(page);

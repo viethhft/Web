@@ -12,7 +12,8 @@ import {
     ForgotPasswordDto,
     ActionDto,
     UserDto,
-    RoleDto
+    RoleDto,
+    ProfileUserDto
 } from './user.dtos';
 import { toHttpParams } from '../../share/Services/Service.Share';
 
@@ -33,6 +34,12 @@ export class UserService {
 
     createUser(user: CreateUserDto): Observable<ResponseData<string>> {
         return this.http.post<ResponseData<string>>(api.user.createUser, user);
+    }
+
+    getProfile(token: string): Observable<ResponseData<ProfileUserDto>> {
+        return this.http.get<ResponseData<ProfileUserDto>>(api.user.getProfile, {
+            params: toHttpParams({ token })
+        });
     }
 
     updateUser(updateInfo: UpdateInfoDto): Observable<ResponseData<string>> {

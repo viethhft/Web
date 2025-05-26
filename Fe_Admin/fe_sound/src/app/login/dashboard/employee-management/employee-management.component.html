@@ -42,46 +42,56 @@
             <table class="employee-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Thao tác</th>
+                        <th>Mã người dùng</th>
                         <th>Tên</th>
                         <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Giới tính</th>
                         <th>Vai trò</th>
+                        <th>Trạng thái xác nhận</th>
                         <th>Trạng thái</th>
-                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let employee of employees">
-                        <td>{{ employee.id }}</td>
-                        <td>{{ employee.name }}</td>
-                        <td>{{ employee.email }}</td>
-                        <td>{{ employee.role }}</td>
+                    <tr *ngFor="let employee of listUser">
                         <td>
-                            <span class="status-badge" [ngClass]="getStatusClass(employee.status)">{{ employee.status
+                            <button *ngIf="!employee.isDeleted" class="action-button delete-button"
+                                (click)="deleteEmployee(employee)" title="Xóa">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M3 6h18"></path>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                </svg>
+                            </button>
+
+                            <button *ngIf="employee.isDeleted" class="action-button active-button"
+                                (click)="activeEmployee(employee)" title="Kích hoạt">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M5 13l4 4L19 7" /> <!-- check icon -->
+                                </svg>
+                            </button>
+                        </td>
+                        <td>{{ employee.name }}</td>
+                        <td>{{ employee.displayName }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>{{ employee.phoneNumber===''?"Chưa có": employee.phoneNumber}}</td>
+                        <td>{{ employee.gender }}</td>
+                        <td>{{ employee.roles }}</td>
+                        <td>
+                            <span class="status-badge" [ngClass]="getStatusConfirmClass(employee.isConfirm)">{{
+                                employee.isConfirm?"Đã xác nhận":"Chưa xác nhận"
                                 }}</span>
                         </td>
                         <td>
-                            <div class="action-buttons">
-                                <button class="action-button" (click)="editEmployee(employee)" title="Chỉnh sửa">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                    </svg>
-                                </button>
-                                <button class="action-button delete-button" (click)="deleteEmployee(employee)"
-                                    title="Xóa">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
-                                        <path d="M3 6h18"></path>
-                                        <path
-                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </div>
+                            <span class="status-badge" [ngClass]="getStatusDeleteClass(employee.isDeleted)">{{
+                                employee.isDeleted?"Ngưng hoạt động":"Đang hoạt động"
+                                }}</span>
                         </td>
                     </tr>
                 </tbody>
@@ -89,7 +99,7 @@
         </div>
 
         <div class="table-pagination">
-            <p class="pagination-info">Hiển thị 1-{{ employees.length }} của {{ employees.length }} nhân viên</p>
+            <p class="pagination-info">Hiển thị 1-{{ listUser.length }} của {{ listUser.length }} nhân viên</p>
             <div class="pagination-controls">
                 <button class="pagination-button" [disabled]="currentPage === 1" (click)="previousPage()">
                     Trước

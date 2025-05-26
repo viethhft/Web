@@ -4,28 +4,31 @@
     <div class="settings-card">
         <div class="settings-section">
             <h3 class="section-title">Cài đặt tài khoản</h3>
-            <form [formGroup]="accountForm" (ngSubmit)="saveAccountChanges()">
+            <form #profileForm="ngForm" (ngSubmit)="saveAccountChanges(profileForm)">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="username">Tên người dùng</label>
-                        <input type="text" id="username" formControlName="username" class="form-input">
+                        <label for="username">Tên đăng nhập</label>
+                        <input type="text" id="username" name="username" [(ngModel)]="userUpdateForm.name"
+                            class="form-input">
                     </div>
+
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" formControlName="email" class="form-input">
+                        <input type="email" id="email" name="email" [(ngModel)]="userUpdateForm.email"
+                            class="form-input">
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="newPassword">Mật khẩu mới</label>
-                        <input type="password" id="newPassword" formControlName="newPassword" placeholder="••••••••"
-                            class="form-input">
+                        <label for="displayName">Họ và tên</label>
+                        <input type="text" id="displayName" name="displayName" [(ngModel)]="userUpdateForm.displayName"
+                            placeholder="Nhập họ và tên" class="form-input">
                     </div>
                     <div class="form-group">
-                        <label for="confirmPassword">Xác nhận mật khẩu</label>
-                        <input type="password" id="confirmPassword" formControlName="confirmPassword"
-                            placeholder="••••••••" class="form-input">
+                        <label for="phoneNumber">Số điện thoại</label>
+                        <input type="text" id="phoneNumber" [(ngModel)]="userUpdateForm.phoneNumber" name="phoneNumber"
+                            placeholder="Nhập số điện thoại" class="form-input">
                     </div>
                 </div>
 
@@ -36,79 +39,44 @@
         </div>
 
         <div class="settings-section">
-            <h3 class="section-title">Cài đặt thông báo</h3>
-            <div class="toggle-list">
-                <div class="toggle-item">
-                    <div class="toggle-content">
-                        <p class="toggle-title">Thông báo email</p>
-                        <p class="toggle-description">Nhận thông báo qua email khi có file âm nhạc mới</p>
+            <h3 class="section-title">Cài đặt mật khẩu</h3>
+            <form #changePassForm="ngForm" (ngSubmit)="changePassword(changePassForm)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="oldPassword">Mật khẩu cũ</label>
+                        <input type="password" id="oldPassword" name="oldPassword"
+                            [(ngModel)]="changePasswordForm.oldPassword" placeholder="***********" class="form-input"
+                            required #oldPassword="ngModel">
+                        <div class="error-message" *ngIf="oldPassword.touched && oldPassword.errors?.['required']">
+                            Vui lòng mật khẩu cũ </div>
                     </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" [checked]="notificationSettings.emailNotifications"
-                            (change)="toggleNotification('emailNotifications')">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
 
-                <div class="toggle-item">
-                    <div class="toggle-content">
-                        <p class="toggle-title">Thông báo hệ thống</p>
-                        <p class="toggle-description">Nhận thông báo trong hệ thống</p>
+                    <div class="form-group">
+                        <label for="newPassword">Mật khẩu mới</label>
+                        <input type="password" id="newPassword" name="newPassword"
+                            [(ngModel)]="changePasswordForm.newPassword" placeholder="***********" class="form-input"
+                            required #newPassword="ngModel">
+                        <div class="error-message" *ngIf="newPassword.touched && newPassword.errors?.['required']">
+                            Vui lòng nhập mật khẩu mới </div>
                     </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" [checked]="notificationSettings.systemNotifications"
-                            (change)="toggleNotification('systemNotifications')">
-                        <span class="toggle-slider"></span>
-                    </label>
                 </div>
 
-                <div class="toggle-item">
-                    <div class="toggle-content">
-                        <p class="toggle-title">Thông báo cập nhật</p>
-                        <p class="toggle-description">Nhận thông báo khi có cập nhật hệ thống</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                            [(ngModel)]="changePasswordForm.confirmPassword" placeholder="***********"
+                            class="form-input" required #confirmPassword="ngModel">
+                        <div class="error-message"
+                            *ngIf="confirmPassword.touched && confirmPassword.errors?.['required']">
+                            Vui lòng nhập xác nhận mật khẩu mới </div>
                     </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" [checked]="notificationSettings.updateNotifications"
-                            (change)="toggleNotification('updateNotifications')">
-                        <span class="toggle-slider"></span>
-                    </label>
                 </div>
-            </div>
-        </div>
 
-        <div class="settings-section">
-            <h3 class="section-title">Cài đặt hệ thống</h3>
-            <div class="form-group">
-                <label for="language">Ngôn ngữ</label>
-                <select id="language" class="form-select">
-                    <option>Tiếng Việt</option>
-                    <option>English</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="timezone">Múi giờ</label>
-                <select id="timezone" class="form-select">
-                    <option>(GMT+07:00) Hà Nội, Bangkok</option>
-                    <option>(GMT+08:00) Bắc Kinh, Singapore</option>
-                    <option>(GMT+09:00) Tokyo, Seoul</option>
-                </select>
-            </div>
-
-            <div class="toggle-item">
-                <div class="toggle-content">
-                    <p class="toggle-title">Chế độ tối</p>
-                    <p class="toggle-description">Bật/tắt chế độ tối cho giao diện</p>
+                <div class="form-actions">
+                    <button type="submit" class="save-button">Lưu thay đổi</button>
                 </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" [checked]="systemSettings.darkMode" (change)="toggleDarkMode()">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div class="form-actions">
-                <button type="button" class="save-button" (click)="saveSystemChanges()">Lưu thay đổi</button>
-            </div>
+            </form>
         </div>
     </div>
 </div>
