@@ -1,0 +1,15 @@
+<form [formGroup]="form" class="custom-form">
+    <div formArrayName="checkboxes">
+        <div *ngFor="let item of itemList" class="form-item">
+            <label class="checkbox-label">
+                <input type="checkbox" [checked]="item.checked" (change)="onCheckChange(item)" />
+                <span class="checkmark"></span>
+                {{ item.name }}
+            </label>
+        </div>
+    </div>
+
+    <div class="save-button-container" (click)="$event.stopPropagation()">
+        <button type="button" class="save-button" (click)="saveUpdateRole()">Lưu</button>
+    </div>
+</form>

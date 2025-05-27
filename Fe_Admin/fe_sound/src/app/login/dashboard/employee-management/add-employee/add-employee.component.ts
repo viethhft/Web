@@ -19,8 +19,6 @@ export class AddEmployeeComponent extends BaseModel implements OnInit {
         gender: true,
         token: ""
     }
-    isLoading = false;
-
     constructor(
         private dialogRef: MatDialogRef<AddEmployeeComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -39,6 +37,7 @@ export class AddEmployeeComponent extends BaseModel implements OnInit {
         debugger
         form.form.markAllAsTouched();
         if (form.valid) {
+            this.IsLoading = true;
 
             this.userDto.token = this.getCurrentToken();
             this.userService.createUser(this.userDto).subscribe(
@@ -55,7 +54,7 @@ export class AddEmployeeComponent extends BaseModel implements OnInit {
                     console.error('Error:', error);
                 }
             ).add(() => {
-                this.isLoading = false;
+                this.IsLoading = false;
             });
         }
     }

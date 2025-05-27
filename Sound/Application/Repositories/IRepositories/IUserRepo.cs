@@ -8,6 +8,9 @@ namespace Application.Repositories.IRepositories
     public interface IUserRepo
     {
         Task<ResponseData<Pagination<UserDto>>> GetListUser(int PageSize = 10, int PageNumber = 1);
+        Task<ResponseData<Pagination<UserDto>>> FilterUserByRole(int PageSize = 10, int PageNumber = 1, string role = "");
+        Task<ResponseData<Pagination<UserDto>>> FilterUserByStatus(int PageSize = 10, int PageNumber = 1, bool status = true);
+        Task<ResponseData<Pagination<UserDto>>> SearchUser(int PageSize = 10, int PageNumber = 1, string key = "");
         Task<ResponseData<List<RoleDto>>> GetListRole();
         Task<ResponseData<string>> CreateUser(CreateUserDto user);
         Task<ResponseData<string>> Admin(CreateAdminDto user);

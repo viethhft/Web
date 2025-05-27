@@ -5,11 +5,13 @@ import { ToastrModule } from 'ngx-toastr';
 
 import { EmployeeManagementComponent } from './employee-management.component';
 import { AddEmployeeComponent } from './add-employee/add-employee.component';
+import { EditRoleComponent } from './edit-role/edit-role.component';
 
 @NgModule({
     declarations: [
         EmployeeManagementComponent,
-        AddEmployeeComponent
+        AddEmployeeComponent,
+        EditRoleComponent
     ],
     imports: [
         CommonModule,
@@ -18,7 +20,8 @@ import { AddEmployeeComponent } from './add-employee/add-employee.component';
     ],
     exports: [
         EmployeeManagementComponent,
-        AddEmployeeComponent
+        AddEmployeeComponent,
+        EditRoleComponent
     ]
 })
 export class EmployeeManagementModule { } 

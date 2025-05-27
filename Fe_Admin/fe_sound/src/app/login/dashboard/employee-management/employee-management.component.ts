@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewContainerRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { AddEmployeeComponent } from './add-employee/add-employee.component';
@@ -7,7 +7,9 @@ import { GetList } from '../../../../share/Dtos/Dtos.Share';
 import { ActionDto, UserDto } from '../../../../services/user/user.dtos';
 import { BaseModel, DataSettingForm } from '../../../../share/Dtos/Base.model';
 import { CookieService } from 'ngx-cookie-service';
-import { Action } from 'rxjs/internal/scheduler/Action';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { EditRoleComponent } from './edit-role/edit-role.component';
 
 @Component({
     selector: 'app-employee-management',
@@ -25,6 +27,7 @@ export class EmployeeManagementComponent extends BaseModel implements OnInit {
         PageSize: 10
     };
 
+    private overlayRef: OverlayRef | null = null;
     listUser: UserDto[] = [];
 
     roles = ["Tất cả vai trò", "Quản lý", "Nhân viên"];
@@ -35,7 +38,9 @@ export class EmployeeManagementComponent extends BaseModel implements OnInit {
         private userService: UserService,
         dialog: MatDialog,
         cookieService: CookieService,
-        private cd: ChangeDetectorRef
+        private cd: ChangeDetectorRef,
+        private overlay: Overlay,
+        private viewContainerRef: ViewContainerRef
     ) {
         super(dialog, cookieService);
     }
@@ -60,6 +65,42 @@ export class EmployeeManagementComponent extends BaseModel implements OnInit {
                 this.IsLoading = false;
             }
         );
+    }
+
+    editRole(event: Event, employee: UserDto): void {
+        if (this.overlayRef) {
+            this.overlayRef.dispose();
+        }
+
+        const target = event.target as HTMLElement;
+        const positionStrategy = this.overlay
+            .position()
+            .flexibleConnectedTo(target)
+            .withPositions([
+                {
+                    originX: 'end',
+                    originY: 'center',
+                    overlayX: 'start',
+                    overlayY: 'center',
+                },
+            ]);
+
+        this.overlayRef = this.overlay.create({
+            positionStrategy,
+            hasBackdrop: true,
+            backdropClass: 'transparent-backdrop',
+            scrollStrategy: this.overlay.scrollStrategies.close(),
+        });
+        const portal = new ComponentPortal(EditRoleComponent);
+        const componentRef = this.overlayRef.attach(portal);
+
+        componentRef.instance.data = { ...employee };
+        componentRef.instance.close.subscribe(() => {
+            this.overlayRef?.dispose();
+        });
+        // Click ra ngoài sẽ đóng
+        this.overlayRef.backdropClick().subscribe(() => this.overlayRef?.dispose());
+
     }
 
     getStatusDeleteClass(status: boolean): string {

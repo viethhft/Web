@@ -33,6 +33,22 @@ export class UserService {
         });
     }
 
+    filterUserByRole(params: GetList): Observable<ResponseData<Pagination<UserDto>>> {
+        return this.http.get<ResponseData<Pagination<UserDto>>>(api.user.getListUser, {
+            params: toHttpParams(params)
+        });
+    }
+    filterUserByStatus(params: GetList): Observable<ResponseData<Pagination<UserDto>>> {
+        return this.http.get<ResponseData<Pagination<UserDto>>>(api.user.getListUser, {
+            params: toHttpParams(params)
+        });
+    }
+    searchUser(params: GetList): Observable<ResponseData<Pagination<UserDto>>> {
+        return this.http.get<ResponseData<Pagination<UserDto>>>(api.user.getListUser, {
+            params: toHttpParams(params)
+        });
+    }
+
     createUser(user: CreateUserDto): Observable<ResponseData<string>> {
         return this.http.post<ResponseData<string>>(api.user.createUser, user);
     }

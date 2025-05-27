@@ -72,5 +72,17 @@ namespace Application.Services
         {
             return await _userRepo.VerifyFirstLogIn(firstLogInDto);
         }
+        public async Task<ResponseData<Pagination<UserDto>>> FilterUserByRole(int PageSize = 10, int PageNumber = 1, string role = "")
+        {
+            return await _userRepo.FilterUserByRole(PageSize, PageNumber, role);
+        }
+        public async Task<ResponseData<Pagination<UserDto>>> FilterUserByStatus(int PageSize = 10, int PageNumber = 1, bool status = true)
+        {
+            return await _userRepo.FilterUserByStatus(PageSize, PageNumber, status);
+        }
+        public async Task<ResponseData<Pagination<UserDto>>> SearchUser(int PageSize = 10, int PageNumber = 1, string key = "")
+        {
+            return await _userRepo.SearchUser(PageSize, PageNumber, key);
+        }
     }
 }

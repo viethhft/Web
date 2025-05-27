@@ -791,5 +791,251 @@ namespace Application.Repositories
                 }
             }
         }
+        public async Task<ResponseData<Pagination<UserDto>>> FilterUserByRole(int PageSize = 10, int PageNumber = 1, string role = "")
+        {
+            PageNumber = PageNumber < 0 ? PageNumber = 1 : PageNumber;
+            List<UserDto> lst = new List<UserDto>();
+            int totalPage = 0;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand("FilterUserByRole", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@pageSize", System.Data.SqlDbType.Int).Value = PageSize;
+                        cmd.Parameters.Add("@pageNumber", System.Data.SqlDbType.Int).Value = PageNumber;
+                        cmd.Parameters.Add("@name", System.Data.SqlDbType.NVarChar).Value = role;
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var temp = new UserDto
+                                {
+                                    Name = reader["Name"].ToString(),
+                                    DisplayName = reader["DisplayName"].ToString(),
+                                    IsConfirm = (bool)reader["IsConfirm"],
+                                    IsDeleted = (bool)reader["IsDeleted"],
+                                    Gender = reader["Gender"].ToString(),
+                                    PhoneNumber = reader["PhoneNumber"].ToString(),
+                                    Email = reader["Email"].ToString(),
+                                    Roles = reader["Roles"].ToString(),
+                                    Id = Guid.Parse(reader["Id"].ToString()),
+                                };
+                                lst.Add(temp);
+                            }
+                            if (await reader.NextResultAsync())
+                            {
+                                if (await reader.ReadAsync())
+                                {
+                                    totalPage = Convert.ToInt32(reader["TotalPage"]);
+                                }
+                            }
+                        }
+                    }
+                    if (lst.Count > 0)
+                    {
+                        return new ResponseData<Pagination<UserDto>>
+                        {
+                            IsSuccess = true,
+                            Data = new Pagination<UserDto>
+                            {
+                                TotalPage = totalPage,
+                                CurrentPage = PageNumber,
+                                Data = lst,
+                            }
+                        };
+                    }
+                    else
+                    {
+                        return new ResponseData<Pagination<UserDto>>
+                        {
+                            IsSuccess = false,
+                            Data = new Pagination<UserDto>
+                            {
+                                TotalPage = totalPage,
+                                CurrentPage = PageNumber,
+                                Data = new List<UserDto>(),
+                            }
+                        };
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<Pagination<UserDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message
+                    };
+                }
+            }
+        }
+        public async Task<ResponseData<Pagination<UserDto>>> FilterUserByStatus(int PageSize = 10, int PageNumber = 1, bool status = true)
+        {
+            PageNumber = PageNumber < 0 ? PageNumber = 1 : PageNumber;
+            List<UserDto> lst = new List<UserDto>();
+            int totalPage = 0;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand("FilterUserByStatus", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@pageSize", System.Data.SqlDbType.Int).Value = PageSize;
+                        cmd.Parameters.Add("@pageNumber", System.Data.SqlDbType.Int).Value = PageNumber;
+                        cmd.Parameters.Add("@status", System.Data.SqlDbType.Bit).Value = status;
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var temp = new UserDto
+                                {
+                                    Name = reader["Name"].ToString(),
+                                    DisplayName = reader["DisplayName"].ToString(),
+                                    IsConfirm = (bool)reader["IsConfirm"],
+                                    IsDeleted = (bool)reader["IsDeleted"],
+                                    Gender = reader["Gender"].ToString(),
+                                    PhoneNumber = reader["PhoneNumber"].ToString(),
+                                    Email = reader["Email"].ToString(),
+                                    Roles = reader["Roles"].ToString(),
+                                    Id = Guid.Parse(reader["Id"].ToString()),
+                                };
+                                lst.Add(temp);
+                            }
+                            if (await reader.NextResultAsync())
+                            {
+                                if (await reader.ReadAsync())
+                                {
+                                    totalPage = Convert.ToInt32(reader["TotalPage"]);
+                                }
+                            }
+                        }
+                    }
+                    if (lst.Count > 0)
+                    {
+                        return new ResponseData<Pagination<UserDto>>
+                        {
+                            IsSuccess = true,
+                            Data = new Pagination<UserDto>
+                            {
+                                TotalPage = totalPage,
+                                CurrentPage = PageNumber,
+                                Data = lst,
+                            }
+                        };
+                    }
+                    else
+                    {
+                        return new ResponseData<Pagination<UserDto>>
+                        {
+                            IsSuccess = false,
+                            Data = new Pagination<UserDto>
+                            {
+                                TotalPage = totalPage,
+                                CurrentPage = PageNumber,
+                                Data = new List<UserDto>(),
+                            }
+                        };
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<Pagination<UserDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message
+                    };
+                }
+            }
+        }
+        public async Task<ResponseData<Pagination<UserDto>>> SearchUser(int PageSize = 10, int PageNumber = 1, string key = "")
+        {
+            PageNumber = PageNumber < 0 ? PageNumber = 1 : PageNumber;
+            List<UserDto> lst = new List<UserDto>();
+            int totalPage = 0;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand("SearchUser", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@pageSize", System.Data.SqlDbType.Int).Value = PageSize;
+                        cmd.Parameters.Add("@pageNumber", System.Data.SqlDbType.Int).Value = PageNumber;
+                        cmd.Parameters.Add("@key", System.Data.SqlDbType.NVarChar).Value = key;
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var temp = new UserDto
+                                {
+                                    Name = reader["Name"].ToString(),
+                                    DisplayName = reader["DisplayName"].ToString(),
+                                    IsConfirm = (bool)reader["IsConfirm"],
+                                    IsDeleted = (bool)reader["IsDeleted"],
+                                    Gender = reader["Gender"].ToString(),
+                                    PhoneNumber = reader["PhoneNumber"].ToString(),
+                                    Email = reader["Email"].ToString(),
+                                    Roles = reader["Roles"].ToString(),
+                                    Id = Guid.Parse(reader["Id"].ToString()),
+                                };
+                                lst.Add(temp);
+                            }
+                            if (await reader.NextResultAsync())
+                            {
+                                if (await reader.ReadAsync())
+                                {
+                                    totalPage = Convert.ToInt32(reader["TotalPage"]);
+                                }
+                            }
+                        }
+                    }
+                    if (lst.Count > 0)
+                    {
+                        return new ResponseData<Pagination<UserDto>>
+                        {
+                            IsSuccess = true,
+                            Data = new Pagination<UserDto>
+                            {
+                                TotalPage = totalPage,
+                                CurrentPage = PageNumber,
+                                Data = lst,
+                            }
+                        };
+                    }
+                    else
+                    {
+                        return new ResponseData<Pagination<UserDto>>
+                        {
+                            IsSuccess = false,
+                            Data = new Pagination<UserDto>
+                            {
+                                TotalPage = totalPage,
+                                CurrentPage = PageNumber,
+                                Data = new List<UserDto>(),
+                            }
+                        };
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<Pagination<UserDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message
+                    };
+                }
+            }
+        }
     }
 }

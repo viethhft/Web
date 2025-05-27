@@ -24,6 +24,24 @@ namespace API.Controllers
             return await _userService.GetListUser(PageSize, PageNumber);
         }
 
+        [HttpGet("FilterUserByRole")]
+        public async Task<ResponseData<Pagination<UserDto>>> FilterUserByRole(int PageSize = 10, int PageNumber = 1)
+        {
+            return await _userService.GetListUser(PageSize, PageNumber);
+        }
+
+        [HttpGet("FilterUserByStatus")]
+        public async Task<ResponseData<Pagination<UserDto>>> FilterUserByStatus(int PageSize = 10, int PageNumber = 1)
+        {
+            return await _userService.GetListUser(PageSize, PageNumber);
+        }
+
+        [HttpGet("SearchUser")]
+        public async Task<ResponseData<Pagination<UserDto>>> SearchUser(int PageSize = 10, int PageNumber = 1)
+        {
+            return await _userService.GetListUser(PageSize, PageNumber);
+        }
+
         [HttpPost("CreateUser")]
         public async Task<ResponseData<string>> CreateUser(CreateUserDto user)
         {

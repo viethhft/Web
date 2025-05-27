@@ -48,7 +48,6 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
         this.soundService.getSoundByAdmin(dataGet).subscribe(
             (response) => {
                 if (response.isSuccess) {
-                    console.log("Lấy danh sách âm thanh thành công", response.data)
                     this.musicFiles = response.data.data.map((item) => ({
                         ...item,
                         file: this.changeDataToFile(item.content, item.contentType, item.fileName),

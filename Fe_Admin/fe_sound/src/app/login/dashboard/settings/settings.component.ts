@@ -47,7 +47,7 @@ export class SettingsComponent extends BaseModel {
                     this.userUpdateForm = {
                         email: response.data.email,
                         name: response.data.name,
-                        phoneNumber: response.data.phoneNumber ? response.data.phoneNumber : 'Chưa cập nhật',
+                        phoneNumber: response.data.phoneNumber,
                         displayName: response.data.displayName,
                         token: this.getCurrentToken(),
                     };

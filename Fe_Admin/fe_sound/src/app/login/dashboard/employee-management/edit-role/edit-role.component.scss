@@ -1,0 +1,95 @@
+.custom-form {
+    padding: 1.5rem;
+    background: #f0f2f8; // nền dịu thay vì trắng
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    max-width: 420px;
+    margin: auto;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.form-item {
+    margin-bottom: 14px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    padding-left: 42px;
+    font-size: 16px;
+    user-select: none;
+    color: #2c2c54; // tím đậm thay cho đen thuần
+}
+
+.checkbox-label input[type='checkbox'] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    left: 0;
+    top: 3px;
+    height: 22px;
+    width: 22px;
+    background-color: #dfe4f2; // nền hộp checkbox dịu nhẹ
+    border: 2px solid #7b61ff;
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+.checkbox-label input:checked~.checkmark {
+    background: linear-gradient(135deg, #7b61ff, #2196f3);
+    border-color: transparent;
+}
+
+.checkmark:after {
+    content: '';
+    position: absolute;
+    display: none;
+}
+
+.checkbox-label input:checked~.checkmark:after {
+    display: block;
+}
+
+.checkbox-label .checkmark:after {
+    left: 6px;
+    top: 3px;
+    width: 6px;
+    height: 11px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.save-button-container {
+    text-align: right;
+
+    .save-button {
+        padding: 0.4rem 1rem;
+        background: linear-gradient(135deg, #7b61ff, #2196f3); // tím → xanh
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 12px rgba(123, 97, 255, 0.4);
+    }
+
+    .save-button:hover {
+        background: linear-gradient(135deg, #6b52f7, #1a88e5);
+        box-shadow: 0 6px 16px rgba(123, 97, 255, 0.5);
+    }
+
+    .save-button:active {
+        transform: scale(0.98);
+    }
+}
