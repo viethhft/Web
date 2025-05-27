@@ -64,19 +64,23 @@ export class SettingsComponent extends BaseModel {
     }
 
     saveAccountChanges(form: NgForm) {
-        this.userUpdateForm.token = this.getCurrentToken();
-        this.userService.updateUser(this.userUpdateForm).subscribe({
-            next: (response) => {
-                if (response.isSuccess) {
-                    this.toastr.success(response.message, "Thông báo");
-                } else {
-                    this.toastr.error(response.message, "Thông báo");
+        form.form.markAllAsTouched();
+        if (form.form.valid) {
+            this.userUpdateForm.token = this.getCurrentToken();
+            this.userService.updateUser(this.userUpdateForm).subscribe({
+                next: (response) => {
+                    if (response.isSuccess) {
+                        this.toastr.success(response.message, "Thông báo");
+                        localStorage.setItem("name", this.userUpdateForm.displayName);
+                    } else {
+                        this.toastr.error(response.message, "Thông báo");
+                    }
                 }
-            }
-            , error: (error) => {
-                console.error("Error saving account changes", error);
-            }
-        });
+                , error: (error) => {
+                    console.error("Error saving account changes", error);
+                }
+            });
+        }
     }
 
     changePassword(form: NgForm) {
@@ -98,6 +102,7 @@ export class SettingsComponent extends BaseModel {
                             newPassword: '',
                             confirmPassword: '',
                         };
+                        form.resetForm();
                     } else {
                         this.toastr.error(response.message, "Thông báo");
                     }

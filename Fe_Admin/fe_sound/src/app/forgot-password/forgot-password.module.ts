@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ForgotPasswordComponent } from './forgot-password.component';
 import { ForgotPasswordRoutingModule } from './forgot-password-routing.module';
+import { ShareModule } from '../../share/Component/share.module';
 
 @NgModule({
     declarations: [
@@ -13,7 +14,9 @@ import { ForgotPasswordRoutingModule } from './forgot-password-routing.module';
         CommonModule,
         ReactiveFormsModule,
         RouterModule,
-        ForgotPasswordRoutingModule
+        FormsModule,
+        ForgotPasswordRoutingModule,
+        ShareModule
     ],
     exports: [
         ForgotPasswordComponent,

@@ -13,7 +13,8 @@ import {
     ActionDto,
     UserDto,
     RoleDto,
-    ProfileUserDto
+    ProfileUserDto,
+    VerifyFirstLogInDto
 } from './user.dtos';
 import { toHttpParams } from '../../share/Services/Service.Share';
 
@@ -78,5 +79,9 @@ export class UserService {
 
     changeForgotPassword(data: ForgotPasswordDto): Observable<ResponseData<string>> {
         return this.http.patch<ResponseData<string>>(api.user.changeForgotPassword, data);
+    }
+
+    verifyFirstLogIn(data: VerifyFirstLogInDto): Observable<ResponseData<string>> {
+        return this.http.patch<ResponseData<string>>(api.user.verifyFirstLogIn, data);
     }
 }

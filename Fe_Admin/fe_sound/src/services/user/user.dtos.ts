@@ -49,6 +49,16 @@ export interface ActionDto {
     idUser: string;
     token: string;
 }
+
+export class VerifyFirstLogInDto {
+    code: string;
+    token: string;
+    constructor(code: string, token: string) {
+        this.code = code;
+        this.token = token;
+    }
+}
+
 export class ActionDto {
     idUser: string;
     token: string;

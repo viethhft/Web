@@ -41,7 +41,7 @@
             <table class="music-table">
                 <thead>
                     <tr>
-                        <th>Thao tác</th>
+                        <th class="center-cell">Thao tác</th>
                         <th>Ảnh</th>
                         <th>Tên bản nhạc</th>
                         <th class="center-cell">Trạng thái</th>
@@ -52,7 +52,7 @@
                 </thead>
                 <tbody *ngIf="!IsLoading; else loadingBlock">
                     <tr *ngFor="let file of musicFiles">
-                        <td>
+                        <td class="center-cell">
                             <div class="action-buttons">
                                 <button class="action-button" (click)="playMusic(file)"
                                     title="{{ currentFileChoose===file.id ? 'Dừng' : 'Phát' }}">

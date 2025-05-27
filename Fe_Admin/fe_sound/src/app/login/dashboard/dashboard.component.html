@@ -142,7 +142,47 @@
 
         <!-- Main content area -->
         <main class="content">
-            <router-outlet></router-outlet>
+            <router-outlet *ngIf="isConfirm; else firstLogin"></router-outlet>
+            <ng-template #firstLogin>
+                <div class="first-login-container">
+                    <div class="code-First-Login">
+                        <div class="code-First-Login-content">
+                            <h2>Xác nhận lần đầu đăng nhập</h2>
+
+                            <p class="description">Nhập mã xác nhận được gửi đến email của bạn để hoàn tất lần đăng nhập
+                                đầu tiên.
+                            </p>
+                            <form [formGroup]="firstLoginForm" (ngSubmit)="onSubmitSendCodeFirstLogin()">
+                                <div class="form-group">
+                                    <label for="codeFirstLogin">Mã xác nhận</label>
+                                    <input id="codeFirstLogin" type="codeFirstLogin" formControlName="codeFirstLogin"
+                                        placeholder="Vui lòng nhập mã xác nhận lần đàu đăng nhập"
+                                        [class.invalid]="firstLoginForm.get('codeFirstLogin')?.invalid && firstLoginForm.get('codeFirstLogin')?.touched">
+                                </div>
+                                <div class="error-message">
+                                    <span
+                                        *ngIf="firstLoginForm.get('codeFirstLogin')?.invalid && firstLoginForm.get('codeFirstLogin')?.touched">Mã
+                                        xác nhận lần đầu đăng nhập là bắt buộc.</span>
+                                    <span *ngIf="firstLoginForm.get('codeFirstLogin')?.errors?.minlength">Mã xác nhận
+                                        dài 6 kí
+                                        tự.</span>
+                                    <span *ngIf="firstLoginForm.get('codeFirstLogin')?.errors?.maxlength">Mã xác nhận
+                                        dài 6 kí
+                                        tự.</span>
+                                </div>
+                                <div *ngIf="errorMessage" class="error-message">
+                                    <span>{{errorMessage}}</span>
+                                </div>
+                                <button type="submit" class="submit-button"
+                                    [disabled]="IsLoading || firstLoginForm.invalid">
+                                    {{ IsLoading ? 'Đang xử lý...' : 'Gửi mã xác nhận' }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </ng-template>
         </main>
     </div>
 </div>

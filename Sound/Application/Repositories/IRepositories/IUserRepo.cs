@@ -19,5 +19,7 @@ namespace Application.Repositories.IRepositories
         Task<ResponseData<string>> ChangePassword(ChangePasswordDto changePassword);
         Task<ResponseData<string>> ForgotPassword(string email);
         Task<ResponseData<string>> ChangeForgotPassword(ForgotPasswordDto forgotPassword);
+        Task<ResponseData<ProfileUserDto>> GetUserInfo(string token);
+        Task<ResponseData<string>> VerifyFirstLogIn(FirstLogInDto firstLogInDto);
     }
 }

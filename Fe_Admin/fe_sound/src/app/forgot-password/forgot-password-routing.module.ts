@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ForgotPasswordComponent } from './forgot-password.component';
 
 const routes: Routes = [
-    { path: 'forgot-password', component: ForgotPasswordComponent },
+    { path: '', component: ForgotPasswordComponent },
 ];
 @NgModule({
     imports: [RouterModule.forChild(routes)],

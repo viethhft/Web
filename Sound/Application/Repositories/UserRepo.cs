@@ -147,7 +147,7 @@ namespace Application.Repositories
                     Console.WriteLine("Lỗi SQL: " + ex.Message);
                     return new ResponseData<string>
                     {
-                        IsSuccess = true,
+                        IsSuccess = false,
                         Message = "Lỗi : " + ex.Message,
                     };
                 }
@@ -186,7 +186,7 @@ namespace Application.Repositories
                     Console.WriteLine("Lỗi SQL: " + ex.Message);
                     return new ResponseData<string>
                     {
-                        IsSuccess = true,
+                        IsSuccess = false,
                         Message = "Lỗi : " + ex.Message,
                     };
                 }
@@ -212,11 +212,22 @@ namespace Application.Repositories
 
                         var response = await cmd.ExecuteNonQueryAsync();
 
-                        return new ResponseData<string>
+                        if (response > 0)
                         {
-                            IsSuccess = true,
-                            Message = "Cập nhật thông tin thành công!",
-                        };
+                            return new ResponseData<string>
+                            {
+                                IsSuccess = true,
+                                Message = "Cập nhật thông tin thành công!",
+                            };
+                        }
+                        else
+                        {
+                            return new ResponseData<string>
+                            {
+                                IsSuccess = false,
+                                Message = "Cập nhật thông tin thất bại hoặc không có thay đổi nào!"
+                            };
+                        }
                     }
                 }
                 catch (SqlException ex)
@@ -224,7 +235,7 @@ namespace Application.Repositories
                     Console.WriteLine("Lỗi SQL: " + ex.Message);
                     return new ResponseData<string>
                     {
-                        IsSuccess = true,
+                        IsSuccess = false,
                         Message = "Lỗi : " + ex.Message,
                     };
                 }
@@ -259,7 +270,7 @@ namespace Application.Repositories
                     Console.WriteLine("Lỗi SQL: " + ex.Message);
                     return new ResponseData<string>
                     {
-                        IsSuccess = true,
+                        IsSuccess = false,
                         Message = "Lỗi : " + ex.Message,
                     };
                 }
@@ -294,7 +305,7 @@ namespace Application.Repositories
                     Console.WriteLine("Lỗi SQL: " + ex.Message);
                     return new ResponseData<string>
                     {
-                        IsSuccess = true,
+                        IsSuccess = false,
                         Message = "Lỗi : " + ex.Message,
                     };
                 }
@@ -322,6 +333,7 @@ namespace Application.Repositories
                                 data.Id = reader["Id"].ToString();
                                 data.Roles = reader["Roles"].ToString();
                                 data.IsConfirm = (bool)reader["IsConfirm"];
+                                data.DisplayName = reader["DisplayName"].ToString();
                                 if (_extentions.VerifyPassword(data.Password, dataLogin.Password))
                                 {
                                     return new ResponseData<string>
@@ -551,20 +563,31 @@ namespace Application.Repositories
                         {
                             if (await reader.ReadAsync())
                             {
-                                var code = _extentions.GenerateCodeConfirm();
-                                using (SqlCommand cmd1 = new SqlCommand("UpdateCodeForgotPassword", conn))
+                                if ((bool)reader["HasLoggedIn"])
                                 {
-                                    cmd1.CommandType = System.Data.CommandType.StoredProcedure;
+                                    var code = _extentions.GenerateCodeConfirm();
+                                    using (SqlCommand cmd1 = new SqlCommand("UpdateCodeForgotPassword", conn))
+                                    {
+                                        cmd1.CommandType = System.Data.CommandType.StoredProcedure;
 
-                                    cmd1.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(reader["Id"].ToString());
-                                    cmd1.Parameters.Add("@code", System.Data.SqlDbType.VarChar, 50).Value = code;
+                                        cmd1.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(reader["Id"].ToString());
+                                        cmd1.Parameters.Add("@code", System.Data.SqlDbType.VarChar, 50).Value = code;
 
-                                    var response = await cmd1.ExecuteNonQueryAsync();
-                                    await _extentions.SendEmailForgotPassword(reader["Email"].ToString(), code);
+                                        var response = await cmd1.ExecuteNonQueryAsync();
+                                        await _extentions.SendEmailForgotPassword(reader["Email"].ToString(), code);
+                                        return new ResponseData<string>
+                                        {
+                                            IsSuccess = true,
+                                            Message = "Đã gửi mã xác nhận đến email của bạn!",
+                                        };
+                                    }
+                                }
+                                else
+                                {
                                     return new ResponseData<string>
                                     {
-                                        IsSuccess = true,
-                                        Message = "Đã gửi mã xác nhận đến email của bạn!",
+                                        IsSuccess = false,
+                                        Message = "Tài khoản chưa đăng nhập lần nào, không thể lấy lại mật khẩu!"
                                     };
                                 }
                             }
@@ -666,6 +689,106 @@ namespace Application.Repositories
                     IsSuccess = false,
                     Message = "Lỗi : " + ex.Message
                 };
+            }
+        }
+        public async Task<ResponseData<ProfileUserDto>> GetUserInfo(string token)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand("GetProfileUser", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(_extentions.GetIdForToken(token));
+
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                var userInfo = new ProfileUserDto
+                                {
+                                    Name = reader["Name"].ToString(),
+                                    DisplayName = reader["DisplayName"].ToString(),
+                                    Email = reader["Email"].ToString(),
+                                    PhoneNumber = reader["PhoneNumber"].ToString(),
+                                };
+                                return new ResponseData<ProfileUserDto>
+                                {
+                                    IsSuccess = true,
+                                    Message = "Lấy thông tin người dùng thành công!",
+                                    Data = userInfo
+                                };
+                            }
+                            else
+                            {
+                                return new ResponseData<ProfileUserDto>
+                                {
+                                    IsSuccess = false,
+                                    Message = "Không tìm thấy người dùng!"
+                                };
+                            }
+                        }
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<ProfileUserDto>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message
+                    };
+                }
+            }
+        }
+        public async Task<ResponseData<string>> VerifyFirstLogIn(FirstLogInDto firstLogInDto)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand("VerifyFirstLogIn", conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@id", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(_extentions.GetIdForToken(firstLogInDto.Token));
+                        cmd.Parameters.Add("@code", System.Data.SqlDbType.VarChar, 6).Value = firstLogInDto.Code;
+
+                        var response = await cmd.ExecuteNonQueryAsync();
+
+                        if (response > 0)
+                        {
+                            return new ResponseData<string>
+                            {
+                                IsSuccess = true,
+                                Message = "Xác thực đăng nhập lần đầu thành công!",
+                            };
+                        }
+                        else
+                        {
+                            return new ResponseData<string>
+                            {
+                                IsSuccess = false,
+                                Message = "Mã xác nhận không chính xác hoặc đã được sử dụng!"
+                            };
+                        }
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine("Lỗi SQL: " + ex.Message);
+                    return new ResponseData<string>
+                    {
+                        IsSuccess = false,
+                        Message = "Lỗi : " + ex.Message
+                    };
+                }
             }
         }
     }

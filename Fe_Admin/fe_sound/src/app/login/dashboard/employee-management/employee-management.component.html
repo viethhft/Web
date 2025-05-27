@@ -42,7 +42,7 @@
             <table class="employee-table">
                 <thead>
                     <tr>
-                        <th>Thao tác</th>
+                        <th class="center-cell">Thao tác</th>
                         <th>Mã người dùng</th>
                         <th>Tên</th>
                         <th>Email</th>
@@ -55,7 +55,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let employee of listUser">
-                        <td>
+                        <td class="center-cell">
                             <button *ngIf="!employee.isDeleted" class="action-button delete-button"
                                 (click)="deleteEmployee(employee)" title="Xóa">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 24 24"

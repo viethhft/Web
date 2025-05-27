@@ -64,5 +64,13 @@ namespace Application.Services
         {
             return await _userRepo.ChangeForgotPassword(forgotPassword);
         }
+        public async Task<ResponseData<ProfileUserDto>> GetUserInfo(string token)
+        {
+            return await _userRepo.GetUserInfo(token);
+        }
+        public async Task<ResponseData<string>> VerifyFirstLogIn(FirstLogInDto firstLogInDto)
+        {
+            return await _userRepo.VerifyFirstLogIn(firstLogInDto);
+        }
     }
 }

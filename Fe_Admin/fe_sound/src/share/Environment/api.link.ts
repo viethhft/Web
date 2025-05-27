@@ -48,5 +48,6 @@ export const api = {
 
         changeForgotPassword: `${userBase}/changeForgotPassword`,
         getProfile: `${userBase}/GetProfileUser`,
+        verifyFirstLogIn: `${userBase}/verifyFirstLogIn`,
     },
 }

@@ -23,6 +23,7 @@ namespace Data.Dto.User
         public string Password { get; set; }
         public string Roles { get; set; }
         public bool IsConfirm { get; set; }
+        public string DisplayName { get; set; }
 
     }
     public class UpdateInfoDto
@@ -38,6 +39,18 @@ namespace Data.Dto.User
         public string Name { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
+        public string Code { get; set; }
+    }
+    public class ProfileUserDto
+    {
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+    }
+    public class FirstLogInDto
+    {
+        public string Token { get; set; }
         public string Code { get; set; }
     }
 }

@@ -83,5 +83,15 @@ namespace API.Controllers
         {
             return await _userService.ChangeForgotPassword(forgotPassword);
         }
+        [HttpGet("GetProfileUser")]
+        public async Task<ResponseData<ProfileUserDto>> GetUserInfo(string token)
+        {
+            return await _userService.GetUserInfo(token);
+        }
+        [HttpPatch("VerifyFirstLogIn")]
+        public async Task<ResponseData<string>> VerifyFirstLogIn(FirstLogInDto firstLogInDto)
+        {
+            return await _userService.VerifyFirstLogIn(firstLogInDto);
+        }
     }
 }

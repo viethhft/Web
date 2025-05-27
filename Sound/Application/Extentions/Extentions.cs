@@ -60,7 +60,6 @@ namespace Sound.Application.Extentions
             }
             return msOutput.ToArray();
         }
-
         public string HashPassword(string password)
         {
             byte[] salt = new byte[16];
@@ -116,19 +115,20 @@ namespace Sound.Application.Extentions
             {
                 new Claim(ClaimTypes.NameIdentifier, data.Id.ToString()),
                 new Claim("IsConfirm", data.IsConfirm.ToString()),
+                new Claim("DisplayName", data.DisplayName),
             };
             foreach (var item in data.Roles.Split(","))
             {
                 claims.Add(new Claim(ClaimTypes.Role, item));
             }
 
-            SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("12345678901234567890123456789012"));
+            SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("7f9a1c50-8b77-4c82-85a2-2c6f84035a4a"));
             SigningCredentials signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             SecurityToken securityToken = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30),
-                issuer: "",
-                audience: "",
+                expires: DateTime.UtcNow.AddDays(1),
+                issuer: "https://localhost:5001",
+                audience: "https://localhost:4200",
                 signingCredentials: signingCred
                 );
             string token = new JwtSecurityTokenHandler().WriteToken(securityToken);
@@ -304,6 +304,5 @@ namespace Sound.Application.Extentions
                 return false;
             }
         }
-
     }
 }
