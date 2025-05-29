@@ -49,5 +49,15 @@ namespace Application.Services
         {
             return await _soundRepo.GetSoundByAdmin(PageSize, PageNumber);
         }
+
+        public async Task<ResponseData<Pagination<AdminSoundDto>>> SearchSound(int PageSize = 10, int PageNumber = 1, string Key = "")
+        {
+            return await _soundRepo.SearchSound(PageSize, PageNumber, Key);
+        }
+
+        public async Task<ResponseData<Pagination<AdminSoundDto>>> FilterSoundByStatus(int PageSize = 10, int PageNumber = 1, bool Status = false)
+        {
+            return await _soundRepo.FilterSoundByStatus(PageSize, PageNumber, Status);
+        }
     }
 }

@@ -3,8 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { AddEmployeeComponent } from './add-employee/add-employee.component';
 import { UserService } from '../../../../services/user/user.service';
-import { GetList } from '../../../../share/Dtos/Dtos.Share';
-import { ActionDto, UserDto } from '../../../../services/user/user.dtos';
+import { GetList, GetListFilterRole, GetListFilterStatus, GetListSearch } from '../../../../share/Dtos/Dtos.Share';
+import { ActionDto, RoleDto, UserDto } from '../../../../services/user/user.dtos';
 import { BaseModel, DataSettingForm } from '../../../../share/Dtos/Base.model';
 import { CookieService } from 'ngx-cookie-service';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
@@ -18,20 +18,41 @@ import { EditRoleComponent } from './edit-role/edit-role.component';
 })
 export class EmployeeManagementComponent extends BaseModel implements OnInit {
     searchQuery = "";
-    selectedRole = "Tất cả vai trò";
-    selectedStatus = "Tất cả trạng thái";
-    currentPage = 1;
-    totalPages = 1;
+    selectedRole = "";
+    selectedStatus = "";
+
     dataGet: GetList = {
         PageNumber: 1,
         PageSize: 10
     };
 
+    dataSearch: GetListSearch = {
+        PageNumber: 1,
+        PageSize: 10,
+        Key: ""
+    };
+
+    dataFilterRole: GetListFilterRole = {
+        PageNumber: 1,
+        PageSize: 10,
+        Role: ""
+    };
+
+    dataFilterStatus: GetListFilterStatus = {
+        PageNumber: 1,
+        PageSize: 10,
+        Status: false
+    };
+    searchTime: any;
     private overlayRef: OverlayRef | null = null;
     listUser: UserDto[] = [];
 
-    roles = ["Tất cả vai trò", "Quản lý", "Nhân viên"];
-    statuses = ["Tất cả trạng thái", "Đang hoạt động", "Không hoạt động"];
+    roles: RoleDto[] = [];
+    statuses = [
+        { label: 'Tất cả trạng thái', value: null },
+        { label: 'Hoạt động', value: false },
+        { label: 'Không hoạt động', value: true }
+    ];
 
     constructor(
         private toastr: ToastrService,
@@ -40,13 +61,23 @@ export class EmployeeManagementComponent extends BaseModel implements OnInit {
         cookieService: CookieService,
         private cd: ChangeDetectorRef,
         private overlay: Overlay,
-        private viewContainerRef: ViewContainerRef
     ) {
         super(dialog, cookieService);
     }
 
     ngOnInit(): void {
         this.getListUser(this.dataGet);
+        this.userService.getListRole().subscribe(
+            (response) => {
+                if (response.isSuccess) {
+                    this.roles = [{ id: '', name: 'Tất cả vai trò' }, ...response.data];
+                    this.cd.detectChanges();
+                }
+            },
+            (error) => {
+                console.log(error);
+            }
+        )
     }
 
     getListUser(data: GetList) {
@@ -55,8 +86,8 @@ export class EmployeeManagementComponent extends BaseModel implements OnInit {
             (response) => {
                 if (response.isSuccess) {
                     this.listUser = response.data.data;
-                    this.currentPage = response.data.currentPage;
-                    this.totalPages = response.data.totalPage;
+                    this.CurrentPage = response.data.currentPage;
+                    this.TotalPage = response.data.totalPage;
                     this.cd.detectChanges();
                     this.IsLoading = false;
                 }
@@ -65,6 +96,12 @@ export class EmployeeManagementComponent extends BaseModel implements OnInit {
                 this.IsLoading = false;
             }
         );
+    }
+
+    resetFilter() {
+        this.searchQuery = '';
+        this.selectedRole = '';
+        this.selectedStatus = 'null';
     }
 
     editRole(event: Event, employee: UserDto): void {
@@ -112,18 +149,91 @@ export class EmployeeManagementComponent extends BaseModel implements OnInit {
     }
 
     onSearch(event: Event): void {
+        this.resetFilter();
         this.searchQuery = (event.target as HTMLInputElement).value;
+        if (this.searchQuery === "") {
+            this.dataGet.PageNumber = 1;
+            this.getListUser(this.dataGet);
+            return;
+        }
         this.toastr.info('Đang tìm kiếm...', 'Thông báo');
+        if (this.searchTime) {
+            clearTimeout(this.searchTime);
+        }
+        this.searchTime = setTimeout(() => {
+            this.dataSearch.Key = this.searchQuery;
+            this.userService.searchUser(this.dataSearch).subscribe(
+                (response) => {
+                    this.listUser = response.data.data;
+                    this.CurrentPage = response.data.currentPage;
+                    this.TotalPage = response.data.totalPage;
+                    this.toastr.info("Tìm kiếm hoàn tất");
+                    this.cd.detectChanges();
+                },
+                (error) => {
+                    console.log(error);
+                    this.toastr.error("Có lỗi xảy ra vui lòng liên hệ nhà phát triển")
+                }
+            )
+        }, 300);
     }
 
     onRoleChange(event: Event): void {
+        this.resetFilter();
         this.selectedRole = (event.target as HTMLSelectElement).value;
-        this.toastr.info(`Đã lọc theo vai trò: ${this.selectedRole}`, 'Thông báo');
+        const namerole = this.roles.filter(c => c.id === this.selectedRole)[0];
+
+        this.toastr.info(`Đang lọc theo vai trò ${namerole.name}`, 'Thông báo');
+
+        if (this.selectedRole === '') {
+            this.dataGet.PageNumber = 1;
+            this.getListUser(this.dataGet);
+            return;
+        }
+
+        this.dataFilterRole.Role = this.selectedRole;
+        this.userService.filterUserByRole(this.dataFilterRole).subscribe(
+            (response) => {
+                this.listUser = response.data.data;
+                this.CurrentPage = response.data.currentPage;
+                this.TotalPage = response.data.totalPage;
+                this.toastr.info("Lọc hoàn tất");
+                this.cd.detectChanges();
+            },
+            (error) => {
+                console.log(error);
+            }
+        )
     }
 
     onStatusChange(event: Event): void {
-        this.selectedStatus = (event.target as HTMLSelectElement).value;
-        this.toastr.info(`Đã lọc theo trạng thái: ${this.selectedStatus}`, 'Thông báo');
+        this.resetFilter();
+        const value = (event.target as HTMLSelectElement).value;
+        this.selectedStatus = value;
+        console.log(this.selectedStatus);
+
+        const status = this.statuses.filter(c => (c.value !== null ? c.value.toString() : 'null') === this.selectedStatus)[0];
+        this.toastr.info(`Đã lọc theo trạng thái: ${status.label}`, 'Thông báo');
+        if (status.value !== null) {
+            this.dataFilterStatus.Status = status.value ?? false;
+        }
+        else {
+            this.dataGet.PageNumber = 1;
+            this.getListUser(this.dataGet);
+            return;
+        }
+        this.userService.filterUserByStatus(this.dataFilterStatus).subscribe(
+            (response) => {
+                this.listUser = response.data.data;
+                this.CurrentPage = response.data.currentPage;
+                this.TotalPage = response.data.totalPage;
+                this.toastr.info("Lọc hoàn tất");
+                this.cd.detectChanges();
+            },
+            (error) => {
+                console.log(error);
+            }
+        )
     }
 
     previousPage(): void {

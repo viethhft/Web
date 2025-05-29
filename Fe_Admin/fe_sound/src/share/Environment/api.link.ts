@@ -9,6 +9,10 @@ export const api = {
 
         getSoundByAdmin: `${soundBase}/getSoundByAdmin`,
 
+        searchSound: `${soundBase}/SearchSound`,
+
+        filerSoundByStatus: `${soundBase}/FilterSoundByStatus`,
+
         addSound: `${soundBase}/addSound`,
 
         updateSound: `${soundBase}/updateSound`,
@@ -25,6 +29,12 @@ export const api = {
     },
     user: {
         getListUser: `${userBase}/getListUser`,
+
+        filterUserByRole: `${userBase}/FilterUserByRole`,
+
+        filterUserByStatus: `${userBase}/FilterUserByStatus`,
+
+        searchUser: `${userBase}/SearchUser`,
 
         createUser: `${userBase}/createUser`,
 

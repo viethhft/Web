@@ -1,6 +1,7 @@
 import { NgModule } from "@angular/core"
 import { RouterModule, type Routes } from "@angular/router"
 import { AuthGuard } from "./guards/auth.guard"
+import { UnauthorizedComponent } from "./unauthorized/unauthorized.component"
 
 const routes: Routes = [
     {
@@ -20,6 +21,10 @@ const routes: Routes = [
                 loadChildren: () => import('./forgot-password/forgot-password.module').then(m => m.ForgotPasswordModule),
             }
         ]
+    },
+    {
+        path: "unauthorized",
+        component: UnauthorizedComponent
     },
     {
         path: "",

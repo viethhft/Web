@@ -12,14 +12,17 @@ using System.Net.Mail;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace Sound.Application.Extentions
 {
     public class Extentions
     {
         private readonly string ffmpegPath = "/Users/macminia2/Web/Sound/Application/Extentions/AppZip/ffmpeg";
-        public Extentions()
+        private readonly IConfiguration _configuration;
+        public Extentions(IConfiguration configuration)
         {
+            _configuration = configuration;
         }
 
         public async Task<byte[]> CompressMp3Async(IFormFile inputFile, int bitrateKbps = 96)
@@ -122,13 +125,13 @@ namespace Sound.Application.Extentions
                 claims.Add(new Claim(ClaimTypes.Role, item));
             }
 
-            SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("7f9a1c50-8b77-4c82-85a2-2c6f84035a4a"));
+            SecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JWT:Key").Value));
             SigningCredentials signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             SecurityToken securityToken = new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(1),
-                issuer: "https://localhost:5001",
-                audience: "https://localhost:4200",
+                issuer: _configuration.GetSection("JWT:Issuer").Value,
+                audience: _configuration.GetSection("JWT:Audience").Value,
                 signingCredentials: signingCred
                 );
             string token = new JwtSecurityTokenHandler().WriteToken(securityToken);

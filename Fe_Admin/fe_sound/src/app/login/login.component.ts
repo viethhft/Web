@@ -4,22 +4,24 @@ import { AuthService } from "../services/auth.service"
 import { NgForm } from '@angular/forms';
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
+import { BaseModel } from "../../share/Dtos/Base.model";
 
 @Component({
     selector: "app-login",
     templateUrl: './login.component.html',
     styleUrls: ["./login.component.scss"],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent extends BaseModel implements OnInit {
     userLogin: LoginDto = {
         name: null,
         password: null,
     }
-    isLoading = false
     showPassword = false
     errorMessage?: string;
 
-    constructor(private authService: AuthService, private router: Router, private toastr: ToastrService) { }
+    constructor(private authService: AuthService, private router: Router, private toastr: ToastrService) {
+        super()
+    }
 
     ngOnInit(): void {
         if (this.authService.isAuthenticated()) {
@@ -29,10 +31,10 @@ export class LoginComponent implements OnInit {
 
     onSubmit(form: NgForm) {
         if (form.valid) {
-            this.isLoading = true;
+            this.IsLoading = true;
             this.authService.login(this.userLogin).subscribe(
                 (response) => {
-                    this.isLoading = false;
+                    this.IsLoading = false;
                     if (response.isSuccess) {
                         this.toastr.success(response.message);
                         this.errorMessage = undefined;
@@ -43,7 +45,7 @@ export class LoginComponent implements OnInit {
                     }
                 },
                 (error) => {
-                    this.isLoading = false;
+                    this.IsLoading = false;
                     console.error("Login failed", error);
                 }
             );

@@ -28,12 +28,9 @@
 
             <div class="filter-options">
                 <select class="filter-select" [value]="selectedCategory" (change)="onCategoryChange($event)">
-                    <option *ngFor="let category of categories">{{ category }}</option>
+                    <option *ngFor="let category of categories" [value]="category.value">{{ category.name }}</option>
                 </select>
 
-                <select class="filter-select" [value]="sortOption" (change)="onSortChange($event)">
-                    <option *ngFor="let option of sortOptions">{{ option }}</option>
-                </select>
             </div>
         </div>
 

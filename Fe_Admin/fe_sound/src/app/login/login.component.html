@@ -60,8 +60,8 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="login-button" [disabled]="isLoading">
-                        {{ isLoading ? 'Đang xử lý...' : 'Đăng nhập' }}
+                    <button type="submit" class="login-button" [disabled]="IsLoading">
+                        {{ IsLoading ? 'Đang xử lý...' : 'Đăng nhập' }}
                     </button>
                     <div style="margin-top: 1rem;">
                         <span *ngIf="errorMessage" class="error-message">{{ errorMessage }}</span>

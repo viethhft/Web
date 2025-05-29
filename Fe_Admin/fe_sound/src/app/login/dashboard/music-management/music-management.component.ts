@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from "@angular/core"
 import { SoundService } from "../../../../services/sound/sound.service"
 import { ConvertDate } from "../../../../share/Services/Extentions"
-import { GetList } from "../../../../share/Dtos/Dtos.Share"
+import { GetList, GetListFilterStatus, GetListSearch } from "../../../../share/Dtos/Dtos.Share"
 import { AdminSound } from "../../../../services/sound/sound.dtos"
 import { BaseModel, DataSettingForm } from "../../../../share/Dtos/Base.model"
 import { AddMusicComponent } from "./add-music/add-music.component"
@@ -15,12 +15,23 @@ import { CookieService } from "ngx-cookie-service"
 })
 export class MusicManagementComponent extends BaseModel implements OnInit {
     searchQuery = ""
-    selectedCategory = "Tất cả thể loại"
-    sortOption = "Sắp xếp theo"
+    selectedCategory = ""
     dataGet: GetList = {
         PageSize: 5,
         PageNumber: 1,
     }
+    dataSearch: GetListSearch = {
+        PageNumber: 1,
+        PageSize: 5,
+        Key: ""
+    };
+
+    dataFilterStatus: GetListFilterStatus = {
+        PageNumber: 1,
+        PageSize: 5,
+        Status: false
+    };
+    searchTime: any;
     musicFiles: AdminSound[] = [];
     audio: HTMLAudioElement | null = null;
     currentFileChoose: number = -1;
@@ -30,8 +41,13 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
     nameAudioPlaying?: string = "";
     hideAudio: boolean = false;
     convertDate = ConvertDate;
-    categories = ["Tất cả", "Đang hoạt động", "Ngừng hoạt động"]
-    sortOptions = ["Sắp xếp theo", "Ngày thêm", "Tên"]
+
+    categories = [
+        { name: "Tất cả trạng thái", value: null },
+        { name: "Đang hoạt động", value: false },
+        { name: "Ngưng hoạt động", value: true },
+    ]
+    
     constructor(private soundService: SoundService, private cd: ChangeDetectorRef, private mat: MatDialog, private logService: ToastrService,
         private cookieService: CookieService
     ) {
@@ -81,17 +97,79 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
     }
 
     onSearch(event: Event): void {
-        this.searchQuery = (event.target as HTMLInputElement).value
-        // Implement search logic here
+        this.resetFilter();
+        this.searchQuery = (event.target as HTMLInputElement).value;
+        if (this.searchQuery === "") {
+            this.dataGet.PageNumber = 1;
+            this.getDataSound(this.dataGet);
+            return;
+        }
+        this.logService.info('Đang tìm kiếm...', 'Thông báo');
+        if (this.searchTime) {
+            clearTimeout(this.searchTime);
+        }
+        this.searchTime = setTimeout(() => {
+            this.dataSearch.Key = this.searchQuery;
+            this.IsLoading = true;
+            this.soundService.SearchSound(this.dataSearch).subscribe(
+                (response) => {
+                    this.musicFiles = response.data.data.map((item) => ({
+                        ...item,
+                        file: this.changeDataToFile(item.content, item.contentType, item.fileName)
+                    }));
+                    this.TotalPage = response.data.totalPage;
+                    this.CurrentPage = response.data.currentPage;
+                    this.IsLoading = false;
+                    this.cd.detectChanges();
+                },
+                (error) => {
+                    this.IsLoading = true;
+                    console.log(error);
+                    this.logService.error("Có lỗi xảy ra vui lòng liên hệ nhà phát triển")
+                }
+            )
+        }, 300);
     }
 
     onCategoryChange(event: Event): void {
-        this.selectedCategory = (event.target as HTMLSelectElement).value
+        this.resetFilter();
+        const value = (event.target as HTMLSelectElement).value;
+        this.selectedCategory = value;
+
+        const status = this.categories.filter(c => (c.value !== null ? c.value.toString() : 'null') === this.selectedCategory)[0];
+        this.logService.info(`Đã lọc theo trạng thái: ${status.name}`, 'Thông báo');
+        if (status.value !== null) {
+            this.dataFilterStatus.Status = status.value ?? false;
+        }
+        else {
+            this.dataGet.PageNumber = 1;
+            this.getDataSound(this.dataGet);
+            return;
+        }
+        this.IsLoading = true;
+        this.soundService.FilerSoundByStatus(this.dataFilterStatus).subscribe(
+            (response) => {
+                this.musicFiles = response.data.data.map((item) => ({
+                    ...item,
+                    file: this.changeDataToFile(item.content, item.contentType, item.fileName)
+                }));
+                this.CurrentPage = response.data.currentPage;
+                this.TotalPage = response.data.totalPage;
+                this.logService.info("Lọc hoàn tất");
+                this.IsLoading = false;
+
+                this.cd.detectChanges();
+            },
+            (error) => {
+                this.IsLoading = false;
+                console.log(error);
+            }
+        )
     }
 
-    onSortChange(event: Event): void {
-        this.sortOption = (event.target as HTMLSelectElement).value
-        // Implement sort logic here
+    resetFilter() {
+        this.searchQuery = '';
+        this.selectedCategory = 'null';
     }
 
     previousPage(): void {
@@ -199,6 +277,7 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
             this.audio!.pause();
         }
     }
+
     editMusic(file: AdminSound): void {
         const data: DataSettingForm = {
             width: "600px",
@@ -279,6 +358,7 @@ export class MusicManagementComponent extends BaseModel implements OnInit {
             }
         })
     }
+
     goToPage(page: number) {
         if (page >= 1 && page <= this.TotalPage && page !== this.CurrentPage) {
             this.IsLoading = true

@@ -8,6 +8,8 @@ namespace Application.Repositories.IRepositories
     {
         Task<ResponseData<Pagination<SoundDto>>> GetSound(int PageSize = 10, int PageNumber = 1);
         Task<ResponseData<Pagination<AdminSoundDto>>> GetSoundByAdmin(int PageSize = 10, int PageNumber = 1);
+        Task<ResponseData<Pagination<AdminSoundDto>>> SearchSound(int PageSize = 10, int PageNumber = 1,string Key="");
+        Task<ResponseData<Pagination<AdminSoundDto>>> FilterSoundByStatus(int PageSize = 10, int PageNumber = 1,bool Status=false);
         Task<ResponseData<List<GetMixSoundDto>>> GetSound(int idMix);
         Task<ResponseData<string>> CreateMix(CreateMixSoundDto mix);
         Task<ResponseData<string>> SaveMix(UpdateMixSoundDto update);

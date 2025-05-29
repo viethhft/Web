@@ -29,11 +29,11 @@
 
             <div class="filter-options">
                 <select class="filter-select" [value]="selectedRole" (change)="onRoleChange($event)">
-                    <option *ngFor="let role of roles">{{ role }}</option>
+                    <option *ngFor="let role of roles" [value]="role.id">{{ role.name }}</option>
                 </select>
 
                 <select class="filter-select" [value]="selectedStatus" (change)="onStatusChange($event)">
-                    <option *ngFor="let status of statuses">{{ status }}</option>
+                    <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
                 </select>
             </div>
         </div>
@@ -109,11 +109,11 @@
         <div class="table-pagination">
             <p class="pagination-info">Hiển thị 1-{{ listUser.length }} của {{ listUser.length }} nhân viên</p>
             <div class="pagination-controls">
-                <button class="pagination-button" [disabled]="currentPage === 1" (click)="previousPage()">
+                <button class="pagination-button" [disabled]="CurrentPage === 1" (click)="previousPage()">
                     Trước
                 </button>
-                <button class="pagination-button active">{{ currentPage }}</button>
-                <button class="pagination-button" [disabled]="currentPage === totalPages" (click)="nextPage()">
+                <button class="pagination-button active">{{ CurrentPage }}</button>
+                <button class="pagination-button" [disabled]="CurrentPage === TotalPage" (click)="nextPage()">
                     Sau
                 </button>
             </div>

@@ -20,27 +20,27 @@ builder.Services.AddScoped<ISoundService, SoundService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<Extentions>();
 
-// builder.Services.AddAuthentication(options =>
-// {
-//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-// }).AddJwtBearer(options =>
-// {
-//     options.TokenValidationParameters = new TokenValidationParameters()
-//     {
-//         ValidateActor = true,
-//         ValidateIssuer = true,
-//         ValidateAudience = true,
-//         RequireExpirationTime = true,
-//         ValidateIssuerSigningKey = true,
-//         ValidIssuer = builder.Configuration.GetSection("JWT:Issuer").Value,
-//         ValidAudience = builder.Configuration.GetSection("JWT:Audience").Value,
-//         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Key").Value))
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateActor = true,
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        RequireExpirationTime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration.GetSection("JWT:Issuer").Value,
+        ValidAudience = builder.Configuration.GetSection("JWT:Audience").Value,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Key").Value))
 
-//     };
-// });
+    };
+});
 
-// builder.Services.AddAuthorization();
+builder.Services.AddAuthorization();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -54,17 +54,12 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.WithOrigins("http://localhost:4200")
                .AllowAnyHeader()
-               .AllowAnyMethod();
+               .AllowAnyMethod()
+               .AllowCredentials();
     });
 
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
 });
 
 var app = builder.Build();
@@ -81,7 +76,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseCors("AllowAll");
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();

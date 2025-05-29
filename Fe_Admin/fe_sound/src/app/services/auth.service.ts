@@ -13,6 +13,7 @@ import { JwtPayload } from "jwt-decode";
 interface MyJwtPayload extends JwtPayload {
   DisplayName?: string;
   IsConfirm?: boolean;
+  Roles: string[]
 }
 
 @Injectable({
@@ -21,7 +22,8 @@ interface MyJwtPayload extends JwtPayload {
 export class AuthService {
   private tokenSubject: BehaviorSubject<string | null>;
   private readonly TOKEN_KEY = 'auth_token';
-
+  private readonly ROLE_CLAIM = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+  private hasLoggedOut = false;
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -38,7 +40,7 @@ export class AuthService {
           let token = jwtDecode<MyJwtPayload>(response.data);
           localStorage.setItem('name', token.DisplayName || '');
           localStorage.setItem('isConfirm', (token.IsConfirm ?? false).toString());
-          this.cookieService.set(this.TOKEN_KEY, response.data);
+          this.cookieService.set(this.TOKEN_KEY, response.data,);
           this.tokenSubject.next(response.data);
         }
       })
@@ -46,6 +48,8 @@ export class AuthService {
   }
 
   logout(): void {
+    if (this.hasLoggedOut) return;
+    this.hasLoggedOut = true;
     this.cookieService.delete(this.TOKEN_KEY);
     localStorage.removeItem('name');
     localStorage.removeItem('isConfirm');
@@ -75,6 +79,34 @@ export class AuthService {
           }
 
           return true;
+        } catch (err) {
+          this.logout();
+          return false;
+        }
+      })
+    );
+  }
+
+  isAuthorized(rolesAllowed: string[]): Observable<boolean> {
+    if (!rolesAllowed) {
+      return of(true);
+    }
+    return this.tokenSubject.asObservable().pipe(
+      map(token => {
+        if (!token) {
+          this.logout();
+          return false;
+        }
+
+        try {
+          const rawDecoded = jwtDecode<any>(token);
+          const mapped: MyJwtPayload = {
+            ...rawDecoded,
+            Roles: rawDecoded[this.ROLE_CLAIM],
+          };
+
+          const hasRole = rolesAllowed.some(role => mapped.Roles.includes(role));
+          return hasRole;
         } catch (err) {
           this.logout();
           return false;

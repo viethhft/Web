@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { GetList, ResponseData, Pagination } from '../../share/Dtos/Dtos.Share';
+import { GetList, ResponseData, Pagination, GetListSearch, GetListFilterStatus, GetListFilterRole } from '../../share/Dtos/Dtos.Share';
 import {
     CreateUserDto,
     UpdateInfoDto,
@@ -33,18 +33,18 @@ export class UserService {
         });
     }
 
-    filterUserByRole(params: GetList): Observable<ResponseData<Pagination<UserDto>>> {
-        return this.http.get<ResponseData<Pagination<UserDto>>>(api.user.getListUser, {
+    filterUserByRole(params: GetListFilterRole): Observable<ResponseData<Pagination<UserDto>>> {
+        return this.http.get<ResponseData<Pagination<UserDto>>>(api.user.filterUserByRole, {
             params: toHttpParams(params)
         });
     }
-    filterUserByStatus(params: GetList): Observable<ResponseData<Pagination<UserDto>>> {
-        return this.http.get<ResponseData<Pagination<UserDto>>>(api.user.getListUser, {
+    filterUserByStatus(params: GetListFilterStatus): Observable<ResponseData<Pagination<UserDto>>> {
+        return this.http.get<ResponseData<Pagination<UserDto>>>(api.user.filterUserByStatus, {
             params: toHttpParams(params)
         });
     }
-    searchUser(params: GetList): Observable<ResponseData<Pagination<UserDto>>> {
-        return this.http.get<ResponseData<Pagination<UserDto>>>(api.user.getListUser, {
+    searchUser(params: GetListSearch): Observable<ResponseData<Pagination<UserDto>>> {
+        return this.http.get<ResponseData<Pagination<UserDto>>>(api.user.searchUser, {
             params: toHttpParams(params)
         });
     }

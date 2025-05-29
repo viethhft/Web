@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../share/Environment/environment';
 import { SoundDto, AdminSoundDto, GetMixSoundDto, CreateMixSoundDto, UpdateMixSoundDto, AddSound, EditSound } from './sound.dtos';
-import { ResponseData, Pagination, GetList } from '../../share/Dtos/Dtos.Share';
+import { ResponseData, Pagination, GetList, GetListFilterStatus, GetListSearch } from '../../share/Dtos/Dtos.Share';
 import { toFormBody, toHttpParams } from '../../share/Services/Service.Share';
 import { api } from '../../share/Environment/api.link';
 @Injectable({
@@ -18,6 +18,14 @@ export class SoundService {
 
     getSoundByAdmin(dataGet: GetList): Observable<ResponseData<Pagination<AdminSoundDto>>> {
         return this.http.get<ResponseData<Pagination<AdminSoundDto>>>(api.sound.getSoundByAdmin, { params: toHttpParams(dataGet) });
+    }
+
+    FilerSoundByStatus(dataGet: GetListFilterStatus): Observable<ResponseData<Pagination<AdminSoundDto>>> {
+        return this.http.get<ResponseData<Pagination<AdminSoundDto>>>(api.sound.filerSoundByStatus, { params: toHttpParams(dataGet) });
+    }
+
+    SearchSound(dataGet: GetListSearch): Observable<ResponseData<Pagination<AdminSoundDto>>> {
+        return this.http.get<ResponseData<Pagination<AdminSoundDto>>>(api.sound.searchSound, { params: toHttpParams(dataGet) });
     }
 
     addSound(formData: AddSound): Observable<ResponseData<string>> {

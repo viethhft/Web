@@ -807,7 +807,7 @@ namespace Application.Repositories
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.Add("@pageSize", System.Data.SqlDbType.Int).Value = PageSize;
                         cmd.Parameters.Add("@pageNumber", System.Data.SqlDbType.Int).Value = PageNumber;
-                        cmd.Parameters.Add("@name", System.Data.SqlDbType.NVarChar).Value = role;
+                        cmd.Parameters.Add("@name", System.Data.SqlDbType.UniqueIdentifier).Value = Guid.Parse(role);
                         using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())
@@ -971,7 +971,7 @@ namespace Application.Repositories
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.Add("@pageSize", System.Data.SqlDbType.Int).Value = PageSize;
                         cmd.Parameters.Add("@pageNumber", System.Data.SqlDbType.Int).Value = PageNumber;
-                        cmd.Parameters.Add("@key", System.Data.SqlDbType.NVarChar).Value = key;
+                        cmd.Parameters.Add("@key", System.Data.SqlDbType.NVarChar, 50).Value = key;
                         using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())

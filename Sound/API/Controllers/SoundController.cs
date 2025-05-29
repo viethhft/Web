@@ -48,6 +48,7 @@ namespace API.Controllers
             }
         }
 
+        [Authorize(Roles = "ADMIN, STAFF")]
         [HttpGet("GetSoundByAdmin")]
         public async Task<ResponseData<Pagination<AdminSoundDto>>> GetSoundByAdmin(int PageSize = 10, int PageNumber = 1)
         {
@@ -75,7 +76,7 @@ namespace API.Controllers
             }
         }
 
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN, STAFF")]
         [HttpPost("AddSound")]
         public async Task<ResponseData<string>> AddSound(AddSound sound)
         {
@@ -85,7 +86,7 @@ namespace API.Controllers
                 string image = "";
 
                 content = await _extentions.CompressMp3Async(sound.File);
-    
+
                 using (var ms = new MemoryStream())
                 {
                     await sound.Image.CopyToAsync(ms);
@@ -119,7 +120,7 @@ namespace API.Controllers
             }
         }
 
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN, STAFF")]
         [HttpPut("UpdateSound")]
         public async Task<ResponseData<string>> UpdateSound(EditSound sound)
         {
@@ -159,14 +160,14 @@ namespace API.Controllers
             return await _soundService.UpdateSound(temp, file);
         }
 
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN, STAFF")]
         [HttpDelete("DeleteSound")]
         public async Task<ResponseData<string>> DeleteSound(long id)
         {
             return await _soundService.DeleteSound(id);
         }
 
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN, STAFF")]
         [HttpPatch("ActiveSound")]
         public async Task<ResponseData<string>> ActiveSound(long id)
         {
@@ -189,6 +190,20 @@ namespace API.Controllers
         public async Task<ResponseData<string>> SaveMix(UpdateMixSoundDto update)
         {
             return await _soundService.SaveMix(update);
+        }
+
+        [HttpGet("SearchSound")]
+        [Authorize(Roles = "ADMIN, STAFF")]
+        public async Task<ResponseData<Pagination<AdminSoundDto>>> SearchSound(int PageSize = 10, int PageNumber = 1, string Key = "")
+        {
+            return await _soundService.SearchSound(PageSize, PageNumber, Key);
+        }
+
+        [Authorize(Roles = "ADMIN, STAFF")]
+        [HttpGet("FilterSoundByStatus")]
+        public async Task<ResponseData<Pagination<AdminSoundDto>>> FilterSoundByStatus(int PageSize = 10, int PageNumber = 1, bool Status = false)
+        {
+            return await _soundService.FilterSoundByStatus(PageSize, PageNumber, Status);
         }
     }
 }
